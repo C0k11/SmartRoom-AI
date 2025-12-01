@@ -2,11 +2,6 @@
 
 AI-Powered Interior Design Assistant - Upload a room photo, select a style, get professional design proposals in seconds.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
-
 ## Overview
 
 SmartRoom-AI is an intelligent interior design assistant powered by artificial intelligence. Users simply upload a room photo, select their preferred style, and the AI automatically analyzes room features and generates multiple professional design proposals with matching furniture recommendations.
@@ -19,75 +14,75 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 - [x] Protected routes (design features require login)
 - [x] Persistent user sessions
 
-### 📸 Room Analysis
+### Room Analysis
 - [x] Image upload with preview
 - [x] **Custom room description** - Users can describe room characteristics for more accurate AI analysis
 - [x] Claude AI smart analysis of room type, dimensions, existing furniture
 - [x] Visual display of analysis results
 
-### 🎨 Style Selection
+### Style Selection
 - [x] 8 design styles: Modern, Nordic, Japanese Zen, Industrial, and more
 - [x] Style preview images and descriptions
 - [x] Sub-style variants (e.g., Nordic Sunshine, Nordic Forest)
 
-### 💰 Preference Settings
+### Preference Settings
 - [x] Budget range selection
 - [x] Color preference selection
 - [x] Keep existing furniture option
 - [x] **Furniture suggestions input** - Users can specify desired furniture/brands, AI strictly follows
 - [x] Special requirements (workspace, gaming area, reading nook, etc.)
 
-### 🖼️ AI Image Generation
+### AI Image Generation
 - [x] **Auto Chinese-to-English translation** - Chinese requirements auto-translated to English prompts
 - [x] FLUX Pro / DALL-E 3 high-quality image generation
 - [x] Multiple proposals (3 different design schemes)
 - [x] Real-time progress display
 - [x] Auto-retry on generation failure
 
-### 🛒 Smart Product Recommendations
+### Smart Product Recommendations
 - [x] **Claude AI product search** - Intelligent furniture and electronics recommendations
 - [x] Brand recognition (ASUS, MSI, Apple, IKEA, etc.)
 - [x] **Multi-platform purchase links**:
-  - 🇨🇦 Amazon Canada, Best Buy, IKEA, Wayfair, Structube
-  - 🇺🇸 Amazon US, Best Buy, IKEA, Wayfair, Target
-  - 🇨🇳 Taobao, Tmall, JD.com, IKEA China
+  - Canada: Amazon, Best Buy, IKEA, Wayfair, Structube
+  - US: Amazon, Best Buy, IKEA, Wayfair, Target
+  - China: Taobao, Tmall, JD.com, IKEA China
 - [x] Realistic price estimates (CAD/USD/CNY)
 - [x] Automatic total cost calculation
 
-### 🎮 3D Preview
+### 3D Preview
 - [x] Three.js 3D room visualization
 - [x] Drag to rotate, scroll to zoom, right-click to pan
 - [x] Fullscreen immersive preview
 
-### 📤 Export & Share
+### Export & Share
 - [x] Download design images (PNG)
 - [x] Generate share links
 - [x] Social media sharing (Twitter, Facebook, WeChat)
 - [x] Save to history
 
-### 📚 History
+### History
 - [x] Save design proposals locally
 - [x] History page to view all saved designs
 - [x] Preview, download, delete historical designs
 
-### 🌐 Multilingual Support
+### Multilingual Support
 - [x] Chinese/English toggle
 - [x] Global language settings
 - [x] Internationalized UI text
 
-### 📱 Responsive Design
+### Responsive Design
 - [x] Desktop optimized
 - [x] Tablet optimized
 - [x] Mobile optimized
 - [x] Touch-friendly interactions
 
-### ⚡ UX Optimizations
+### UX Optimizations
 - [x] Skeleton loading screens
 - [x] Progress bar animations
 - [x] Toast notifications
 - [x] Smooth page transitions
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 | Technology | Purpose |
@@ -109,7 +104,7 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 | Replicate | ML model hosting |
 | Pydantic | Data validation |
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+
@@ -160,7 +155,7 @@ uvicorn app.main:app --reload --port 8000
 
 6. **Open** http://localhost:3000
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 SmartRoom-AI/
@@ -197,7 +192,7 @@ SmartRoom-AI/
 └── README.md
 ```
 
-## 🎯 User Flow
+## User Flow
 
 1. **Register/Login** - Create an account or sign in
 2. **Upload Photo** - Take or upload a room photo
@@ -208,11 +203,11 @@ SmartRoom-AI/
 7. **Generate Designs** - AI generates multiple design proposals
 8. **View Results** - 3D preview, download, share
 
-## 📸 Screenshots
+## Screenshots
 
 (Coming soon)
 
-## 🔮 Future Plans
+## Future Plans
 
 - [ ] Integrate more image generation models (Midjourney API)
 - [ ] Real product API integration (live pricing)
@@ -221,14 +216,14 @@ SmartRoom-AI/
 - [ ] Multi-room project management
 - [ ] Designer collaboration features
 
-## 📄 License
+## License
 
 MIT License
 
-## 👤 Author
+## Author
 
 **Cok11**
 
 ---
 
-Made with ❤️ by Cok11
+Made by Cok11
