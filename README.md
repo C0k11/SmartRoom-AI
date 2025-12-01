@@ -155,43 +155,6 @@ uvicorn app.main:app --reload --port 8000
 
 6. **Open** http://localhost:3000
 
-## Project Structure
-
-```
-SmartRoom-AI/
-├── frontend/                 # Next.js Frontend
-│   ├── src/
-│   │   ├── app/             # Page routes
-│   │   │   ├── page.tsx     # Home page
-│   │   │   ├── design/      # Design page
-│   │   │   ├── login/       # Login page
-│   │   │   └── history/     # History page
-│   │   ├── components/      # React components
-│   │   │   ├── design/      # Design-related components
-│   │   │   ├── layout/      # Layout components
-│   │   │   └── ui/          # Common UI components
-│   │   ├── lib/             # Utilities
-│   │   │   ├── api.ts       # API client
-│   │   │   ├── auth.tsx     # Auth context
-│   │   │   └── i18n.tsx     # Internationalization
-│   │   └── store/           # Zustand state
-│   └── package.json
-├── backend/                  # FastAPI Backend
-│   ├── app/
-│   │   ├── api/v1/          # API endpoints
-│   │   │   └── endpoints/
-│   │   │       ├── analysis.py   # Room analysis
-│   │   │       └── design.py     # Design generation
-│   │   ├── services/        # Business logic
-│   │   │   ├── vision_service.py        # Image analysis
-│   │   │   ├── design_service.py        # Design concepts
-│   │   │   ├── image_generation_service.py  # Image generation
-│   │   │   └── furniture_matching_service.py # Product recommendations
-│   │   └── core/            # Configuration
-│   └── requirements.txt
-└── README.md
-```
-
 ## User Flow
 
 1. **Register/Login** - Create an account or sign in
