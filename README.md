@@ -216,10 +216,6 @@ SmartRoom-AI/
 - [ ] Multi-room project management
 - [ ] Designer collaboration features
 
-## License
-
-MIT License
-
 ## Author
 
 **Cok11**
