@@ -15,12 +15,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
-    # CORS
-    CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://your-domain.vercel.app",
-    ]
+    # CORS - 允许所有来源（开发环境）
+    CORS_ORIGINS: List[str] = ["*"]
     
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/roomdesign"
@@ -34,12 +30,12 @@ class Settings(BaseSettings):
     OPENAI_MODEL: str = "gpt-4o-mini"
     
     # Anthropic Claude (primary)
-    ANTHROPIC_API_KEY: str = ""  # Set via environment variable
+    ANTHROPIC_API_KEY: str = ""
     CLAUDE_MODEL: str = "claude-sonnet-4-20250514"
     OPENAI_MAX_TOKENS: int = 4096
     
     # Stable Diffusion / Replicate
-    REPLICATE_API_TOKEN: str = ""  # Set via environment variable
+    REPLICATE_API_TOKEN: str = ""
     # FLUX.1 Pro - 最高质量模型 (比schnell贵但效果更好)
     FLUX_MODEL: str = "black-forest-labs/flux-1.1-pro"
     # FLUX Dev 备用 (质量高，比pro便宜)

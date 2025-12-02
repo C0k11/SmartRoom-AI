@@ -1,0 +1,62 @@
+{
+  "expo": {
+    "name": "SmartRoom AI",
+    "slug": "smartroom-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0066FF"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cok11.smartroom",
+      "infoPlist": {
+        "NSCameraUsageDescription": "We need camera access to capture your room for AI design analysis.",
+        "NSPhotoLibraryUsageDescription": "We need photo library access to select room images for design."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0066FF"
+      },
+      "package": "com.cok11.smartroom",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow SmartRoom AI to access your camera for room scanning."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow SmartRoom AI to access your photos for room design."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8702be6d-d336-40b1-9508-5a07230e7eb6"
+      }
+    }
+  }
+}

@@ -3,6 +3,9 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 import uuid
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -49,6 +52,7 @@ async def register(user: UserCreate):
     """
     用户注册
     """
+    logger.info(f"Register request received: {user.email}, {user.name}")
     # Check if email exists
     for u in demo_users.values():
         if u["email"] == user.email:

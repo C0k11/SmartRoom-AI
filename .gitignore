@@ -48,8 +48,13 @@ Thumbs.db
 *.pem
 *.key
 secrets.json
+api_keys.txt
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
+
+# Expo
+.expo/
+.expo-shared/
