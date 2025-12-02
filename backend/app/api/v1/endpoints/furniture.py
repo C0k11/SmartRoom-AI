@@ -84,7 +84,7 @@ async def search_furniture(
 
 @router.get("/categories")
 async def get_categories():
-    """获取所有家具类别"""
+    """Get all furniture categories"""
     return {
         "categories": [
             {"id": "sofa", "name": "沙发", "icon": "🛋️"},
@@ -102,7 +102,7 @@ async def get_categories():
 
 @router.get("/styles")
 async def get_styles():
-    """获取所有家具风格"""
+    """Get all furniture styles"""
     return {
         "styles": [
             {"id": "modern", "name": "现代简约"},
@@ -119,7 +119,7 @@ async def get_styles():
 
 @router.get("/brands")
 async def get_brands():
-    """获取所有品牌"""
+    """Get all brands"""
     return {
         "brands": [
             {"id": "ikea", "name": "IKEA", "country": "瑞典"},
@@ -135,10 +135,10 @@ async def get_brands():
 
 @router.get("/{furniture_id}", response_model=FurnitureItem)
 async def get_furniture_detail(furniture_id: str):
-    """获取家具详情"""
+    """Get furniture detail"""
     item = await furniture_service.get_by_id(furniture_id)
     if not item:
-        return {"error": "家具不存在"}
+        return {"error": "Furniture not found"}
     return item
 
 
@@ -150,9 +150,9 @@ async def match_furniture_for_design(
     existing_furniture: Optional[List[str]] = None,
 ):
     """
-    为设计方案匹配家具
+    Match furniture for design proposal
     
-    根据风格、房间类型和预算，智能推荐家具组合
+    Intelligently recommend furniture combinations based on style, room type, and budget
     """
     matches = await furniture_service.match_furniture(
         style=style,
@@ -170,7 +170,7 @@ async def match_furniture_for_design(
 
 @router.post("/shopping-list/create")
 async def create_shopping_list(design_id: str, items: List[dict]):
-    """创建购物清单"""
+    """Create shopping list"""
     # TODO: Implement with database
     return {
         "id": "sl-001",
@@ -183,14 +183,14 @@ async def create_shopping_list(design_id: str, items: List[dict]):
 
 @router.get("/shopping-list/{list_id}/pdf")
 async def download_shopping_list_pdf(list_id: str):
-    """下载购物清单PDF"""
+    """Download shopping list PDF"""
     # TODO: Generate PDF
-    return {"message": "PDF下载功能开发中", "list_id": list_id}
+    return {"message": "PDF download feature under development", "list_id": list_id}
 
 
 @router.get("/demo/items", response_model=List[FurnitureItem])
 async def get_demo_furniture():
-    """获取示例家具数据"""
+    """Get example furniture data"""
     return [
         FurnitureItem(
             id="demo-f1",

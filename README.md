@@ -76,6 +76,16 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 - [x] Mobile optimized
 - [x] Touch-friendly interactions
 
+### Mobile App (Expo)
+- [x] Native mobile app built with React Native and Expo
+- [x] Camera integration for room photo capture
+- [x] Image picker from gallery
+- [x] Room analysis on mobile
+- [x] Design generation and preview
+- [x] AR preview functionality
+- [x] User authentication
+- [x] Design history synchronization
+
 ### UX Optimizations
 - [x] Skeleton loading screens
 - [x] Progress bar animations
@@ -103,6 +113,16 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 | FLUX / DALL-E | AI image generation |
 | Replicate | ML model hosting |
 | Pydantic | Data validation |
+
+### Mobile
+| Technology | Purpose |
+|------------|---------|
+| React Native | Cross-platform mobile framework |
+| Expo | Development platform and build service |
+| TypeScript | Type safety |
+| React Navigation | Navigation |
+| Expo Camera | Camera access |
+| Expo ImagePicker | Image selection |
 
 ## Getting Started
 
@@ -154,6 +174,39 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 6. **Open** http://localhost:3000
+
+### Mobile App Setup
+
+1. **Install mobile dependencies**
+```bash
+cd mobile
+npm install
+```
+
+2. **Configure API endpoint**
+
+Update `mobile/src/lib/api.ts` to set the correct API base URL:
+- For Android emulator: `http://10.0.2.2:8000/api/v1`
+- For iOS simulator: `http://localhost:8000/api/v1`
+- For physical device: Use your computer's IP address
+
+3. **Start Expo development server**
+```bash
+cd mobile
+npm start
+# or use the PowerShell script
+.\start.ps1
+```
+
+4. **Build with EAS (optional)**
+
+For production builds:
+```bash
+cd mobile
+npx eas-cli build --platform android
+# or
+npx eas-cli build --platform ios
+```
 
 ## User Flow
 

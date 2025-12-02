@@ -84,9 +84,9 @@ async def generate_designs(
     request: dict,
 ):
     """
-    生成设计方案
+    Generate design proposals
     
-    根据房间分析结果和用户偏好，生成多个设计方案
+    Generate multiple design proposals based on room analysis results and user preferences
     """
     logger.info(f"Received design request: {request}")
     
@@ -141,7 +141,7 @@ async def generate_designs(
     return {
         "id": job_id,
         "status": "pending",
-        "message": "正在生成设计方案..."
+        "message": "Generating design proposals..."
     }
 
 
@@ -164,9 +164,9 @@ async def process_design_generation(job_id: str):
         # Combine all user requirements for strict adherence
         all_user_requirements = preferences.get("special_needs", "")
         if preferences.get("room_description"):
-            all_user_requirements = f"房间情况: {preferences['room_description']}. " + all_user_requirements
+            all_user_requirements = f"Room condition: {preferences['room_description']}. " + all_user_requirements
         if preferences.get("additional_notes"):
-            all_user_requirements += f" 其他要求: {preferences['additional_notes']}"
+            all_user_requirements += f" Additional requirements: {preferences['additional_notes']}"
         
         concepts = await design_service.generate_concepts(
             style=preferences["style"],
@@ -242,10 +242,10 @@ async def process_design_generation(job_id: str):
 
 @router.get("/status/{job_id}")
 async def get_design_status(job_id: str):
-    """获取设计生成状态"""
+    """Get design generation status"""
     job = design_jobs.get(job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="任务不存在")
+        raise HTTPException(status_code=404, detail="Job not found")
     
     return {
         "id": job_id,
@@ -258,7 +258,7 @@ async def get_design_status(job_id: str):
 
 @router.get("/demo", response_model=List[DesignProposal])
 async def get_demo_designs():
-    """获取示例设计方案"""
+    """Get example design proposals"""
     return [
         DesignProposal(
             id="demo-design-1",
@@ -331,14 +331,14 @@ async def get_demo_designs():
 
 @router.post("/save/{design_id}")
 async def save_design(design_id: str):
-    """保存设计方案到用户账户"""
+    """Save design proposal to user account"""
     # TODO: Implement with user authentication
-    return {"message": "设计方案已保存", "design_id": design_id}
+    return {"message": "Design proposal saved", "design_id": design_id}
 
 
 @router.get("/share/{design_id}")
 async def get_share_link(design_id: str):
-    """生成设计方案分享链接"""
+    """Generate design proposal share link"""
     share_token = str(uuid.uuid4())[:8]
     return {
         "share_url": f"https://roomai.com/share/{share_token}",

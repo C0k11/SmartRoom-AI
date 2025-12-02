@@ -57,18 +57,18 @@ async def upload_room_image(
     file: UploadFile = File(...),
 ):
     """
-    上传房间照片并开始分析
+    Upload room photo and start analysis
     
-    - **file**: 房间照片文件 (JPG, PNG, WebP)
+    - **file**: Room photo file (JPG, PNG, WebP)
     
-    返回任务ID，可用于轮询获取分析结果
+    Returns job ID for polling analysis results
     """
     # Validate file type
     allowed_types = ["image/jpeg", "image/png", "image/webp"]
     if file.content_type not in allowed_types:
         raise HTTPException(
             status_code=400,
-            detail=f"不支持的文件类型。支持的类型: {', '.join(allowed_types)}"
+            detail=f"Unsupported file type. Supported types: {', '.join(allowed_types)}"
         )
     
     # Validate file size (max 10MB)
@@ -76,7 +76,7 @@ async def upload_room_image(
     if len(content) > 10 * 1024 * 1024:
         raise HTTPException(
             status_code=400,
-            detail="文件大小不能超过10MB"
+            detail="File size cannot exceed 10MB"
         )
     
     # Generate job ID
@@ -105,7 +105,7 @@ async def upload_room_image(
     return {
         "id": job_id,
         "status": "pending",
-        "message": "图片上传成功，正在分析中..."
+        "message": "Image uploaded successfully, analysis in progress..."
     }
 
 
@@ -168,9 +168,9 @@ async def process_analysis(job_id: str):
 @router.get("/status/{job_id}", response_model=AnalysisStatusResponse)
 async def get_analysis_status(job_id: str):
     """
-    获取分析任务状态
+    Get analysis job status
     
-    - **job_id**: 任务ID
+    - **job_id**: Job ID
     """
     job = analysis_jobs.get(job_id)
     if not job:

@@ -50,13 +50,13 @@ demo_users: dict = {}
 @router.post("/register", response_model=TokenResponse)
 async def register(user: UserCreate):
     """
-    用户注册
+    User registration
     """
     logger.info(f"Register request received: {user.email}, {user.name}")
     # Check if email exists
     for u in demo_users.values():
         if u["email"] == user.email:
-            raise HTTPException(status_code=400, detail="邮箱已被注册")
+            raise HTTPException(status_code=400, detail="Email already registered")
     
     user_id = str(uuid.uuid4())
     demo_users[user_id] = {
@@ -80,7 +80,7 @@ async def register(user: UserCreate):
 @router.post("/login", response_model=TokenResponse)
 async def login(credentials: UserLogin):
     """
-    用户登录
+    User login
     """
     for user_id, user in demo_users.items():
         if user["email"] == credentials.email and user["password"] == credentials.password:
@@ -90,13 +90,13 @@ async def login(credentials: UserLogin):
                 user=UserResponse(**{k: v for k, v in user.items() if k != "password"}),
             )
     
-    raise HTTPException(status_code=401, detail="邮箱或密码错误")
+    raise HTTPException(status_code=401, detail="Invalid email or password")
 
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user():
     """
-    获取当前用户信息
+    Get current user information
     """
     # TODO: Implement with JWT authentication
     return UserResponse(
@@ -112,7 +112,7 @@ async def get_current_user():
 @router.put("/me", response_model=UserResponse)
 async def update_profile(profile: UserProfile):
     """
-    更新用户资料
+    Update user profile
     """
     # TODO: Implement with authentication
     return UserResponse(
@@ -128,7 +128,7 @@ async def update_profile(profile: UserProfile):
 @router.get("/me/designs")
 async def get_user_designs():
     """
-    获取用户保存的设计方案
+    Get user saved designs
     """
     return {
         "designs": [],
@@ -139,10 +139,10 @@ async def get_user_designs():
 @router.post("/upgrade")
 async def upgrade_to_premium():
     """
-    升级到高级版
+    Upgrade to premium
     """
     return {
-        "message": "升级功能开发中",
+        "message": "Upgrade feature under development",
         "pricing": {
             "monthly": 29,
             "yearly": 199,

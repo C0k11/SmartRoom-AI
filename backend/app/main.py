@@ -27,14 +27,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Room Design AI",
     description="""
-    智能室内设计助手 API
+    AI-Powered Interior Design Assistant API
     
-    ## 功能
+    ## Features
     
-    * **房间分析** - 上传照片，AI分析房间布局和特征
-    * **设计生成** - 根据风格和预算生成多个设计方案
-    * **家具匹配** - 智能匹配真实家具产品
-    * **3D预览** - 生成3D预览数据
+    * **Room Analysis** - Upload photos, AI analyzes room layout and features
+    * **Design Generation** - Generate multiple design proposals based on style and budget
+    * **Furniture Matching** - Intelligent matching of real furniture products
+    * **3D Preview** - Generate 3D preview data
     """,
     version="0.1.0",
     lifespan=lifespan,

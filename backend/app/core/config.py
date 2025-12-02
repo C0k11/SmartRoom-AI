@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
-    # CORS - 允许所有来源（开发环境）
+    # CORS - Allow all origins (development environment)
     CORS_ORIGINS: List[str] = ["*"]
     
     # Database
@@ -36,11 +36,11 @@ class Settings(BaseSettings):
     
     # Stable Diffusion / Replicate
     REPLICATE_API_TOKEN: str = ""
-    # FLUX.1 Pro - 最高质量模型 (比schnell贵但效果更好)
+    # FLUX.1 Pro - Highest quality model (more expensive than schnell but better results)
     FLUX_MODEL: str = "black-forest-labs/flux-1.1-pro"
-    # FLUX Dev 备用 (质量高，比pro便宜)
+    # FLUX Dev - Alternative (high quality, cheaper than pro)
     FLUX_DEV_MODEL: str = "black-forest-labs/flux-dev"
-    # SDXL 备用
+    # SDXL - Alternative
     SDXL_MODEL: str = "stability-ai/sdxl:c221b2b8ef527988fb59bf24a8b97c4561f1c671f73bd389f866bfb27c061316"
     
     # HuggingFace (for SAM model)
