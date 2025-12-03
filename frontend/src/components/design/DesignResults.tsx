@@ -21,6 +21,7 @@ import {
 import { useDesignStore, DesignProposal } from '@/store/designStore'
 import { designApi, analysisApi } from '@/lib/api'
 import { useLanguage, formatCAD } from '@/lib/i18n'
+import { useAuth } from '@/lib/auth'
 import toast from 'react-hot-toast'
 import dynamic from 'next/dynamic'
 
@@ -74,6 +75,8 @@ export function DesignResults() {
     selectedStyle,
     preferences
   } = useDesignStore()
+  
+  const { isAuthenticated } = useAuth()
 
   const [activeTab, setActiveTab] = useState<'preview' | 'furniture'>('preview')
   const [favorites, setFavorites] = useState<string[]>([])
@@ -220,10 +223,23 @@ export function DesignResults() {
       
     } catch (err: any) {
       console.error('设计生成错误:', err)
-      setError(err.message || '生成设计方案时出现错误')
+      const errorMessage = err.response?.data?.detail || err.message || '生成设计方案时出现错误'
+      setError(errorMessage)
       
-      // 使用fallback数据确保用户体验
-      toast.error('API暂时不可用，显示示例方案')
+      // Check if it's a connection error
+      const isConnectionError = err.code === 'ECONNREFUSED' || err.message?.includes('Network Error') || err.message?.includes('timeout')
+      
+      if (isConnectionError) {
+        toast.error('无法连接到后端服务器，请确保后端服务正在运行', {
+          duration: 5000,
+        })
+      } else {
+        // Use fallback data for other errors
+        toast.error(`生成失败: ${errorMessage}，显示示例方案`, {
+          duration: 5000,
+        })
+      }
+      
       setDesigns(fallbackDesigns)
       setSelectedDesign(fallbackDesigns[0])
     } finally {
@@ -324,26 +340,50 @@ export function DesignResults() {
     }
   }
 
-  // Save design to history (localStorage)
-  const saveToHistory = () => {
+  // Save design to history (backend + localStorage backup)
+  const saveToHistory = async () => {
     if (!selectedDesign) return
     
-    const history = JSON.parse(localStorage.getItem('designHistory') || '[]')
-    const newEntry = {
-      ...selectedDesign,
-      savedAt: new Date().toISOString(),
-      originalImage: uploadedImage
+    try {
+      // Save to backend if authenticated
+      if (isAuthenticated) {
+        await designApi.save(selectedDesign.id)
+      }
+      
+      // Also save to localStorage as backup
+      const history = JSON.parse(localStorage.getItem('designHistory') || '[]')
+      const newEntry = {
+        ...selectedDesign,
+        savedAt: new Date().toISOString(),
+        originalImage: uploadedImage
+      }
+      
+      // Avoid duplicates
+      const filtered = history.filter((h: any) => h.id !== selectedDesign.id)
+      filtered.unshift(newEntry)
+      
+      // Keep only last 20 designs
+      const trimmed = filtered.slice(0, 20)
+      localStorage.setItem('designHistory', JSON.stringify(trimmed))
+      
+      toast.success(isAuthenticated ? 'Design saved to your account!' : 'Design saved to local history!')
+    } catch (error: any) {
+      console.error('Failed to save design:', error)
+      toast.error(error.response?.data?.detail || 'Failed to save design')
+      
+      // Fallback to localStorage only
+      const history = JSON.parse(localStorage.getItem('designHistory') || '[]')
+      const newEntry = {
+        ...selectedDesign,
+        savedAt: new Date().toISOString(),
+        originalImage: uploadedImage
+      }
+      const filtered = history.filter((h: any) => h.id !== selectedDesign.id)
+      filtered.unshift(newEntry)
+      const trimmed = filtered.slice(0, 20)
+      localStorage.setItem('designHistory', JSON.stringify(trimmed))
+      toast.success('Design saved to local history!')
     }
-    
-    // Avoid duplicates
-    const filtered = history.filter((h: any) => h.id !== selectedDesign.id)
-    filtered.unshift(newEntry)
-    
-    // Keep only last 20 designs
-    const trimmed = filtered.slice(0, 20)
-    localStorage.setItem('designHistory', JSON.stringify(trimmed))
-    
-    toast.success('设计方案已保存到历史记录！')
   }
 
   // Loading state

@@ -104,15 +104,20 @@ class FurnitureMatchingService:
 ⚠️ CRITICAL INSTRUCTIONS - YOU MUST FOLLOW EXACTLY:
 
 1. **ONLY recommend products that the user specifically asked for.** 
+   - If user said "只要电脑" or "很多电脑" (only computers / many computers), recommend ONLY computers, monitors, and PC-related equipment
    - If user said "只要农具" (only farm tools), recommend ONLY farm tools, NO furniture, NO electronics
    - If user said "不要家具" (no furniture), do NOT include any furniture
    - If user said "华硕显示器" (ASUS monitor), include ASUS monitors
 
 2. **Parse the user's request carefully:**
+   - "电脑" or "计算机" = computer / PC / desktop computer (NOT farm tools!)
+   - "很多电脑" = many computers / multiple computers / multiple PC setups
+   - "笔记本" = laptop
+   - "显示器" = monitor / display screen
    - "农具" = farm tools (hoes, rakes, shovels, wheelbarrows, etc.)
    - "厨具" = kitchen utensils
    - "家具" = furniture (sofas, tables, chairs)
-   - These are DIFFERENT things!
+   - These are DIFFERENT things! Do NOT confuse "电脑" (computer) with "农具" (farm tools)!
 
 3. **If user specified NO other items, recommend ONLY what they asked for**
    - Do not add "helpful suggestions"

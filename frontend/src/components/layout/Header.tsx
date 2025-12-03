@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Home, 
@@ -11,16 +12,20 @@ import {
   X,
   Sparkles,
   ShoppingBag,
-  Zap,
   Globe,
-  Clock
+  Clock,
+  User,
+  LogOut
 } from 'lucide-react'
 import { CartButton } from '@/components/cart'
 import { useLanguage } from '@/lib/i18n'
+import { useAuth } from '@/lib/auth'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { language, setLanguage, t } = useLanguage()
+  const { user, isAuthenticated, logout } = useAuth()
+  const router = useRouter()
 
   const navItems = [
     { href: '/', label: t('nav.home'), icon: Home },
@@ -41,10 +46,7 @@ export function Header() {
           <div className="container mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               {/* Logo - Cok11 */}
-              <Link href="/" className="flex items-center gap-3 group">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-600 flex items-center justify-center shadow-lg group-hover:shadow-primary-500/30 transition-all duration-300 group-hover:scale-105">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
+              <Link href="/" className="flex items-center group">
                 <span className="text-xl font-bold tracking-tight">
                   <span className="text-slate-800">Cok</span>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-accent-500">11</span>
@@ -80,18 +82,35 @@ export function Header() {
                 </button>
                 
                 <CartButton />
-                <Link
-                  href="/login"
-                  className="px-4 py-2 text-slate-600 hover:text-primary-600 font-medium transition-colors"
-                >
-                  {t('nav.login')}
-                </Link>
-                <Link
-                  href="/design"
-                  className="btn-primary py-2"
-                >
-                  {language === 'zh' ? '免费体验' : 'Try Free'}
-                </Link>
+                
+                {isAuthenticated && user ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-2 text-slate-700">
+                      <User className="w-4 h-4" />
+                      <span className="font-medium">{user.name}</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        logout()
+                        router.push('/')
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                      title={language === 'zh' ? '登出' : 'Logout'}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="font-medium text-sm">
+                        {language === 'zh' ? '登出' : 'Logout'}
+                      </span>
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 text-slate-600 hover:text-primary-600 font-medium transition-colors"
+                  >
+                    {t('nav.login')}
+                  </Link>
+                )}
               </div>
 
               {/* Mobile menu button */}
@@ -141,20 +160,35 @@ export function Header() {
                     </Link>
                   ))}
                   <div className="pt-4 border-t border-slate-200 space-y-2">
-                    <Link
-                      href="/login"
-                      className="block w-full text-center px-4 py-3 text-slate-600 hover:bg-slate-100 rounded-xl font-medium transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('nav.login')}
-                    </Link>
-                    <Link
-                      href="/design"
-                      className="block w-full text-center btn-primary"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {language === 'zh' ? '免费体验' : 'Try Free'}
-                    </Link>
+                    {isAuthenticated && user ? (
+                      <>
+                        <div className="flex items-center gap-2 px-4 py-3 text-slate-700">
+                          <User className="w-5 h-5" />
+                          <span className="font-medium">{user.name}</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            logout()
+                            setIsMenuOpen(false)
+                            router.push('/')
+                          }}
+                          className="block w-full text-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-colors"
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            <LogOut className="w-5 h-5" />
+                            {language === 'zh' ? '登出' : 'Logout'}
+                          </div>
+                        </button>
+                      </>
+                    ) : (
+                      <Link
+                        href="/login"
+                        className="block w-full text-center px-4 py-3 text-slate-600 hover:bg-slate-100 rounded-xl font-medium transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {t('nav.login')}
+                      </Link>
+                    )}
                   </div>
                 </div>
               </motion.div>

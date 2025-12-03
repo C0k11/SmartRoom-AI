@@ -40,14 +40,22 @@ async def translate_to_english(chinese_text: str) -> str:
 Chinese: {chinese_text}
 
 Requirements:
-1. Describe the ROOM TYPE clearly (e.g., "concrete warehouse", "empty storage room")
-2. Describe what ITEMS to put inside (e.g., "farm tools: wooden hoes, metal shovels, rakes, wheelbarrow")
+1. Describe the ROOM TYPE clearly (e.g., "modern office", "gaming room", "living room", "bedroom")
+2. Describe what ITEMS to put inside (e.g., "multiple computers and monitors", "gaming PC setup", "desktop computers")
 3. Be SPECIFIC and VISUAL - describe what the image should look like
 4. If user says "只要X" (only X), emphasize "ONLY [X], nothing else"
 5. If user says "不要Y" (no Y), say "without any [Y]"
+6. If user asks for "很多电脑" (many computers), translate to "multiple computers", "many desktop computers", "multiple PC setups"
 
 Key translations:
-- 农具 = farm tools (wooden hoes, metal shovels, rakes, pitchforks, wheelbarrows hanging on wall or standing)
+- 电脑 = computer / PC / desktop computer (NOT farm tools!)
+- 很多电脑 = many computers / multiple computers / multiple PC setups
+- 计算机 = computer / computing device
+- 笔记本 = laptop
+- 台式机 = desktop computer
+- 显示器 = monitor / display
+- 游戏电脑 = gaming PC / gaming computer
+- 办公电脑 = office computer / workstation
 - 仓库 = warehouse/storage room with concrete walls and floor
 - 水泥 = concrete/cement
 - 封闭 = enclosed, no windows
@@ -309,6 +317,14 @@ class DesignService:
                     
                     if "art" in req_lower or "画" in req_lower or "艺术" in req_lower:
                         concept["prompt"] += ", beautiful wall art and decorative pieces"
+                    
+                    # Computer/PC related requirements
+                    if "computer" in req_lower or "pc" in req_lower or "电脑" in req_lower or "计算机" in req_lower:
+                        concept["highlights"].append("电脑设备")
+                        concept["prompt"] += ", desktop computers, computer monitors, modern PC setup"
+                    
+                    if "很多" in req_lower and ("电脑" in req_lower or "计算机" in req_lower):
+                        concept["prompt"] += ", multiple desktop computers, many PC workstations, multiple monitors setup"
             
             # IMPORTANT: Add brand-specific prompts if not already handled by custom requirements
             if special_needs and special_needs.strip() and not has_custom_requirements:
@@ -328,6 +344,13 @@ class DesignService:
                     brand_prompts.append("Apple iMac, Apple MacBook, Apple Studio Display")
                 if "gaming" in special_lower or "游戏" in special_needs_clean or "电竞" in special_needs_clean:
                     brand_prompts.append("RGB gaming setup, gaming PC, gaming monitors")
+                
+                # General computer/PC requirements (must be checked AFTER brand-specific)
+                if ("电脑" in special_needs_clean or "计算机" in special_needs_clean or "pc" in special_lower or "computer" in special_lower):
+                    if "很多" in special_needs_clean or "multiple" in special_lower or "many" in special_lower:
+                        brand_prompts.append("multiple desktop computers, many PC workstations, multiple computer monitors, PC setup")
+                    else:
+                        brand_prompts.append("desktop computers, computer monitors, PC setup, workstation")
                 
                 # Combine brand prompts
                 if brand_prompts:
