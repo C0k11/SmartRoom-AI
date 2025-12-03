@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { userApi } from './api'
 
 interface User {
   id: string
@@ -27,14 +28,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check for existing session on mount
-    const checkAuth = () => {
+    const checkAuth = async () => {
       const savedUser = localStorage.getItem('user')
       const token = localStorage.getItem('token')
       
       if (savedUser && token) {
         try {
-          setUser(JSON.parse(savedUser))
-        } catch (e) {
+          // Verify token with backend
+          const userData = await userApi.getMe()
+          setUser({
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+          })
+        } catch (error) {
+          // Token invalid, clear local storage
           localStorage.removeItem('user')
           localStorage.removeItem('token')
         }
@@ -47,47 +55,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // In production, call real API
-      // const response = await userApi.login(email, password)
+      const response = await userApi.login(email, password)
       
-      // For demo, simulate successful login
-      const mockUser: User = {
-        id: 'user-' + Date.now(),
-        email,
-        name: email.split('@')[0],
+      if (!response || !response.user || !response.access_token) {
+        throw new Error('Invalid response from server')
       }
       
-      setUser(mockUser)
-      localStorage.setItem('user', JSON.stringify(mockUser))
-      localStorage.setItem('token', 'demo-token-' + Date.now())
+      const user: User = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.name,
+        avatar: response.user.avatar,
+      }
       
+      // Update state and localStorage
+      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('token', response.access_token)
+      setUser(user)  // Update state after localStorage to ensure consistency
+      
+      console.log('Login successful:', user)
       return true
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error)
-      return false
+      const errorMessage = error.response?.data?.detail || error.message || 'Login failed'
+      throw new Error(errorMessage)
     }
   }
 
   const register = async (email: string, password: string, name: string): Promise<boolean> => {
     try {
-      // In production, call real API
-      // const response = await userApi.register(email, password, name)
+      const response = await userApi.register(email, password, name)
       
-      // For demo, simulate successful registration
-      const mockUser: User = {
-        id: 'user-' + Date.now(),
-        email,
-        name,
+      if (!response || !response.user || !response.access_token) {
+        throw new Error('Invalid response from server')
       }
       
-      setUser(mockUser)
-      localStorage.setItem('user', JSON.stringify(mockUser))
-      localStorage.setItem('token', 'demo-token-' + Date.now())
+      const user: User = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.name,
+        avatar: response.user.avatar,
+      }
       
+      // Update state and localStorage
+      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('token', response.access_token)
+      setUser(user)  // Update state after localStorage to ensure consistency
+      
+      console.log('Registration successful:', user)
       return true
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration failed:', error)
-      return false
+      const errorMessage = error.response?.data?.detail || error.message || 'Registration failed'
+      throw new Error(errorMessage)
     }
   }
 

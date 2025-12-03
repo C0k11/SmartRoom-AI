@@ -11,7 +11,6 @@ import {
   Github,
   Chrome,
   User,
-  Zap,
   Sparkles,
   Shield,
   Palette,
@@ -29,12 +28,13 @@ export default function LoginPage() {
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/design'
   
-  const { login, register, loginWithOAuth, isAuthenticated } = useAuth()
+  const { login, register, loginWithOAuth, isAuthenticated, user } = useAuth()
   const { language, setLanguage, t } = useLanguage()
   
   const [isLogin, setIsLogin] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [loginSuccess, setLoginSuccess] = useState(false)
   
   const [formData, setFormData] = useState({
     email: '',
@@ -45,12 +45,31 @@ export default function LoginPage() {
 
   const [errors, setErrors] = useState<{[key: string]: string}>({})
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated or after successful login
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push(redirect)
+    if ((isAuthenticated && user) || loginSuccess) {
+      console.log('User authenticated, redirecting to:', redirect)
+      console.log('Is authenticated:', isAuthenticated)
+      console.log('User:', user)
+      console.log('Login success flag:', loginSuccess)
+      
+      // Double check localStorage to ensure user is logged in
+      const savedUser = localStorage.getItem('user')
+      const token = localStorage.getItem('token')
+      
+      if (savedUser && token) {
+        console.log('✅ Confirmed: User data in localStorage')
+        router.push(redirect)
+        // Force redirect as backup
+        setTimeout(() => {
+          if (window.location.pathname === '/login') {
+            console.log('Force redirecting via window.location...')
+            window.location.href = redirect
+          }
+        }, 300)
+      }
     }
-  }, [isAuthenticated, router, redirect])
+  }, [isAuthenticated, user, loginSuccess, router, redirect])
 
   const texts = {
     zh: {
@@ -173,21 +192,49 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
-      let success = false
+      // Call login/register
+      const success = isLogin 
+        ? await login(formData.email, formData.password)
+        : await register(formData.email, formData.password, formData.name)
       
-      if (isLogin) {
-        success = await login(formData.email, formData.password)
-      } else {
-        success = await register(formData.email, formData.password, formData.name)
+      if (!success) {
+        throw new Error('Authentication failed')
       }
       
-      if (success) {
-        toast.success(isLogin ? txt.success.login : txt.success.register)
-        router.push(redirect)
+      // Mark login as successful
+      setLoginSuccess(true)
+      setIsLoading(false)
+      
+      // Success - show toast
+      const successMessage = isLogin ? txt.success.login : txt.success.register
+      toast.success(successMessage, {
+        duration: 2000,
+        icon: '✅',
+      })
+      
+      console.log('✅ Login/Register successful!')
+      console.log('User in localStorage:', localStorage.getItem('user'))
+      console.log('Token in localStorage:', localStorage.getItem('token') ? 'Present' : 'Missing')
+      
+      // Verify localStorage was set
+      const savedUser = localStorage.getItem('user')
+      const token = localStorage.getItem('token')
+      
+      if (!savedUser || !token) {
+        console.error('❌ Warning: localStorage not set correctly')
+        throw new Error('Failed to save login credentials')
       }
-    } catch (error) {
-      console.error('Auth error:', error)
-    } finally {
+      
+      // The useEffect will handle the redirect when loginSuccess or user state updates
+      
+    } catch (error: any) {
+      console.error('❌ Auth error:', error)
+      const errorMessage = typeof error === 'string' 
+        ? error 
+        : (error?.message || error?.response?.data?.detail || 'Authentication failed')
+      toast.error(errorMessage, {
+        duration: 4000,
+      })
       setIsLoading(false)
     }
   }
@@ -197,13 +244,28 @@ export default function LoginPage() {
     
     try {
       const success = await loginWithOAuth(provider)
-      if (success) {
-        toast.success(txt.success.login)
-        router.push(redirect)
+      
+      if (!success) {
+        throw new Error('OAuth login failed')
       }
-    } catch (error) {
-      console.error('OAuth error:', error)
-    } finally {
+      
+      // Mark login as successful
+      setLoginSuccess(true)
+      setIsLoading(false)
+      
+      toast.success(txt.success.login, {
+        duration: 2000,
+        icon: '✅',
+      })
+      
+      console.log('✅ OAuth login successful!')
+      // The useEffect will handle the redirect
+      
+    } catch (error: any) {
+      console.error('❌ OAuth error:', error)
+      toast.error(error?.message || 'OAuth login failed', {
+        duration: 4000,
+      })
       setIsLoading(false)
     }
   }
@@ -240,10 +302,7 @@ export default function LoginPage() {
           className="w-full max-w-md"
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-accent-600 flex items-center justify-center shadow-lg">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
+          <Link href="/" className="flex items-center mb-8">
             <span className="text-2xl font-bold tracking-tight">
               <span className="text-slate-800">Cok</span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-accent-500">11</span>
@@ -419,6 +478,7 @@ export default function LoginPage() {
                 setIsLogin(!isLogin)
                 setErrors({})
                 setFormData({ email: '', password: '', name: '', confirmPassword: '' })
+                setLoginSuccess(false)
               }}
               className="ml-2 text-primary-600 hover:text-primary-700 font-semibold"
             >

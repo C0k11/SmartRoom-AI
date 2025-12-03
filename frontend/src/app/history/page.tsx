@@ -14,6 +14,7 @@ import {
 import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/lib/auth'
+import { userApi } from '@/lib/api'
 import { formatCAD } from '@/lib/i18n'
 import toast from 'react-hot-toast'
 
@@ -34,18 +35,74 @@ export default function HistoryPage() {
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null)
 
   useEffect(() => {
-    // Load history from localStorage
-    const saved = localStorage.getItem('designHistory')
-    if (saved) {
-      setHistory(JSON.parse(saved))
+    const loadHistory = async () => {
+      if (!isAuthenticated) {
+        // Load from localStorage if not authenticated
+        const saved = localStorage.getItem('designHistory')
+        if (saved) {
+          setHistory(JSON.parse(saved))
+        }
+        return
+      }
+      
+      try {
+        // Load from backend
+        const response = await userApi.getDesigns()
+        if (response.designs && response.designs.length > 0) {
+          // Transform backend format to frontend format
+          const transformedHistory = response.designs.map((design: any) => ({
+            id: design.id,
+            name: design.name || 'Untitled Design',
+            description: design.description || '',
+            image: design.image_url || design.image,
+            style: design.style || 'modern',
+            totalCost: design.total_cost || design.totalCost || 0,
+            savedAt: design.created_at || design.savedAt || new Date().toISOString(),
+            originalImage: design.original_image,
+          }))
+          setHistory(transformedHistory)
+          
+          // Also update localStorage as backup
+          localStorage.setItem('designHistory', JSON.stringify(transformedHistory))
+        } else {
+          // Fallback to localStorage if backend returns empty
+          const saved = localStorage.getItem('designHistory')
+          if (saved) {
+            setHistory(JSON.parse(saved))
+          }
+        }
+      } catch (error: any) {
+        console.error('Failed to load history from backend:', error)
+        // Fallback to localStorage
+        const saved = localStorage.getItem('designHistory')
+        if (saved) {
+          setHistory(JSON.parse(saved))
+        }
+        toast.error('Failed to load history from server, showing local history')
+      }
     }
-  }, [])
+    
+    if (!isLoading) {
+      loadHistory()
+    }
+  }, [isAuthenticated, isLoading])
 
-  const deleteItem = (id: string) => {
-    const updated = history.filter(h => h.id !== id)
-    setHistory(updated)
-    localStorage.setItem('designHistory', JSON.stringify(updated))
-    toast.success('已删除')
+  const deleteItem = async (id: string) => {
+    try {
+      // TODO: Call backend API to delete design when endpoint is available
+      // if (isAuthenticated) {
+      //   await userApi.deleteDesign(id)
+      // }
+      
+      // Update local state and localStorage
+      const updated = history.filter(h => h.id !== id)
+      setHistory(updated)
+      localStorage.setItem('designHistory', JSON.stringify(updated))
+      toast.success('已删除')
+    } catch (error) {
+      console.error('Failed to delete design:', error)
+      toast.error('删除失败')
+    }
   }
 
   const clearAll = () => {
