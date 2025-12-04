@@ -319,13 +319,14 @@ Respond in JSON format only:
         user_needs: str = "",
         region: str = "CA",
         exclude: List[str] = None,
+        language: str = "zh",
     ) -> List[dict]:
         """
         Match furniture using Claude AI for intelligent product search
         """
         exclude = exclude or []
         
-        logger.info(f"Searching products with Claude - Style: {style}, Budget: {budget}, Needs: {user_needs}")
+        logger.info(f"Searching products with Claude - Style: {style}, Budget: {budget}, Needs: {user_needs}, Language: {language}")
         
         # Use Claude to get product recommendations
         products = await self.search_with_claude(
@@ -339,6 +340,13 @@ Respond in JSON format only:
         # Filter out excluded items
         if exclude:
             products = [p for p in products if not any(ex.lower() in p["name"].lower() for ex in exclude)]
+        
+        # Swap name based on language
+        if language == "en":
+            for p in products:
+                if p.get("name_en"):
+                    # Swap: put English as primary name, Chinese as name_en
+                    p["name"], p["name_en"] = p["name_en"], p["name"]
         
         return products
     

@@ -4,17 +4,37 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { DollarSign, TrendingUp } from 'lucide-react'
 import { useDesignStore } from '@/store/designStore'
+import { useLanguage } from '@/lib/i18n'
 
 const presetBudgets = [
-  { value: 2000, label: '经济型', description: '基础改造' },
-  { value: 5000, label: '舒适型', description: '品质提升' },
-  { value: 10000, label: '高端型', description: '全面改造' },
-  { value: 20000, label: '奢华型', description: '顶级配置' },
+  { value: 2000, label: '经济型', labelEn: 'Budget', description: '基础改造', descEn: 'Basic renovation' },
+  { value: 5000, label: '舒适型', labelEn: 'Comfort', description: '品质提升', descEn: 'Quality upgrade' },
+  { value: 10000, label: '高端型', labelEn: 'Premium', description: '全面改造', descEn: 'Full renovation' },
+  { value: 20000, label: '奢华型', labelEn: 'Luxury', description: '顶级配置', descEn: 'Top-tier setup' },
 ]
 
 export function BudgetSelector() {
   const { preferences, updatePreferences } = useDesignStore()
+  const { language } = useLanguage()
   const [customBudget, setCustomBudget] = useState<string>('')
+
+  const texts = {
+    zh: {
+      title: '预算设置',
+      subtitle: '选择或输入您的装修预算',
+      customLabel: '或输入自定义预算',
+      placeholder: '输入金额',
+      selected: '已选预算',
+    },
+    en: {
+      title: 'Budget Setting',
+      subtitle: 'Select or enter your renovation budget',
+      customLabel: 'Or enter custom budget',
+      placeholder: 'Enter amount',
+      selected: 'Selected Budget',
+    }
+  }
+  const txt = texts[language]
 
   const handlePresetSelect = (value: number) => {
     updatePreferences('budget', value)
@@ -44,8 +64,8 @@ export function BudgetSelector() {
           <DollarSign className="w-5 h-5 text-forest-600" />
         </div>
         <div>
-          <h3 className="font-bold text-lg">预算设置</h3>
-          <p className="text-sm text-warmgray-500">选择或输入您的装修预算</p>
+          <h3 className="font-bold text-lg">{txt.title}</h3>
+          <p className="text-sm text-warmgray-500">{txt.subtitle}</p>
         </div>
       </div>
 
@@ -69,10 +89,10 @@ export function BudgetSelector() {
               {formatCurrency(preset.value)}
             </div>
             <div className="text-sm font-medium text-terracotta-600">
-              {preset.label}
+              {language === 'zh' ? preset.label : preset.labelEn}
             </div>
             <div className="text-xs text-warmgray-500 mt-1">
-              {preset.description}
+              {language === 'zh' ? preset.description : preset.descEn}
             </div>
           </motion.button>
         ))}
@@ -81,7 +101,7 @@ export function BudgetSelector() {
       {/* Custom budget input */}
       <div className="relative">
         <label className="block text-sm font-medium text-warmgray-700 mb-2">
-          或输入自定义预算
+          {txt.customLabel}
         </label>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-warmgray-400">
@@ -91,7 +111,7 @@ export function BudgetSelector() {
             type="text"
             value={customBudget}
             onChange={handleCustomBudgetChange}
-            placeholder="输入金额"
+            placeholder={txt.placeholder}
             className="input-primary pl-8"
           />
         </div>
@@ -106,7 +126,7 @@ export function BudgetSelector() {
         >
           <div className="flex items-center gap-3">
             <TrendingUp className="w-5 h-5 text-forest-600" />
-            <span className="text-warmgray-700">已选预算</span>
+            <span className="text-warmgray-700">{txt.selected}</span>
           </div>
           <span className="font-bold text-lg text-forest-700">
             {formatCurrency(preferences.budget)}

@@ -31,36 +31,67 @@ const Preview3D = dynamic(
   { ssr: false, loading: () => <div>Loading 3D...</div> }
 )
 
-// 示例设计方案数据（当API失败时使用）
-const fallbackDesigns: DesignProposal[] = [
-  {
-    id: 'fallback-1',
-    name: '都市雅韵',
-    description: '融合现代简约与北欧温暖，打造都市人的理想居所',
-    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80',
-    style: '现代简约 + 北欧',
-    confidence: 0.95,
-    highlights: ['开放式布局', '自然光优化', '多功能储物'],
-    totalCost: 8500,
-    furniture: [
-      { id: 'f1', name: '北欧布艺沙发', category: '沙发', price: 3200, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200', link: 'https://www.ikea.cn', dimensions: '220x85x80cm', brand: 'IKEA' },
-      { id: 'f2', name: '原木茶几', category: '茶几', price: 1200, image: 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=200', link: 'https://www.taobao.com', dimensions: '120x60x45cm', brand: '源氏木语' },
-    ],
-  },
-  {
-    id: 'fallback-2',
-    name: '禅意栖居',
-    description: '极简日式美学，营造宁静致远的生活空间',
-    image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
-    style: '日式禅风',
-    confidence: 0.92,
-    highlights: ['极简设计', '自然材质', '禅意氛围'],
-    totalCost: 7200,
-    furniture: [
-      { id: 'f5', name: '榻榻米沙发', category: '沙发', price: 2800, image: '', link: 'https://www.taobao.com', dimensions: '200x90x35cm', brand: '木智工坊' },
-    ],
-  },
-]
+// Fallback design data with i18n support
+const fallbackDesignsData = {
+  zh: [
+    {
+      id: 'fallback-1',
+      name: '都市雅韵',
+      description: '融合现代简约与北欧温暖，打造都市人的理想居所',
+      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80',
+      style: '现代简约 + 北欧',
+      confidence: 0.95,
+      highlights: ['开放式布局', '自然光优化', '多功能储物'],
+      totalCost: 8500,
+      furniture: [
+        { id: 'f1', name: '北欧布艺沙发', category: '沙发', price: 3200, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200', link: 'https://www.ikea.cn', dimensions: '220x85x80cm', brand: 'IKEA' },
+        { id: 'f2', name: '原木茶几', category: '茶几', price: 1200, image: 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=200', link: 'https://www.taobao.com', dimensions: '120x60x45cm', brand: 'Yuanshi Wood' },
+      ],
+    },
+    {
+      id: 'fallback-2',
+      name: '禅意栖居',
+      description: '极简日式美学，营造宁静致远的生活空间',
+      image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
+      style: '日式禅风',
+      confidence: 0.92,
+      highlights: ['极简设计', '自然材质', '禅意氛围'],
+      totalCost: 7200,
+      furniture: [
+        { id: 'f5', name: '榻榻米沙发', category: '沙发', price: 2800, image: '', link: 'https://www.taobao.com', dimensions: '200x90x35cm', brand: 'Muzhi Studio' },
+      ],
+    },
+  ],
+  en: [
+    {
+      id: 'fallback-1',
+      name: 'Urban Elegance',
+      description: 'Blending modern minimalism with Nordic warmth, creating the ideal urban dwelling',
+      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80',
+      style: 'Modern + Nordic',
+      confidence: 0.95,
+      highlights: ['Open Layout', 'Natural Light', 'Multi-functional Storage'],
+      totalCost: 8500,
+      furniture: [
+        { id: 'f1', name: 'Nordic Fabric Sofa', category: 'Sofa', price: 3200, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200', link: 'https://www.ikea.com', dimensions: '220x85x80cm', brand: 'IKEA' },
+        { id: 'f2', name: 'Solid Wood Coffee Table', category: 'Table', price: 1200, image: 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=200', link: 'https://www.amazon.com', dimensions: '120x60x45cm', brand: 'Yuanshi Wood' },
+      ],
+    },
+    {
+      id: 'fallback-2',
+      name: 'Zen Retreat',
+      description: 'Minimalist Japanese aesthetics, creating a serene and peaceful living space',
+      image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
+      style: 'Japanese Zen',
+      confidence: 0.92,
+      highlights: ['Minimalist Design', 'Natural Materials', 'Zen Atmosphere'],
+      totalCost: 7200,
+      furniture: [
+        { id: 'f5', name: 'Tatami Sofa', category: 'Sofa', price: 2800, image: '', link: 'https://www.amazon.com', dimensions: '200x90x35cm', brand: 'Muzhi Studio' },
+      ],
+    },
+  ],
+}
 
 export function DesignResults() {
   const { 
@@ -71,18 +102,19 @@ export function DesignResults() {
     selectedDesign,
     setSelectedDesign,
     uploadedImage,
-    analysisResult,
+    analysis,
     selectedStyle,
     preferences
   } = useDesignStore()
   
   const { isAuthenticated } = useAuth()
+  const { language, t } = useLanguage()
 
   const [activeTab, setActiveTab] = useState<'preview' | 'furniture'>('preview')
   const [favorites, setFavorites] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [progress, setProgress] = useState(0)
-  const [statusMessage, setStatusMessage] = useState('初始化...')
+  const [statusMessage, setStatusMessage] = useState('')
   const [error, setError] = useState<string | null>(null)
   const pollingRef = useRef<NodeJS.Timeout | null>(null)
   const isGeneratingRef = useRef(false) // Prevent duplicate requests
@@ -108,14 +140,14 @@ export function DesignResults() {
     setIsLoading(true)
     setError(null)
     setProgress(0)
-    setStatusMessage('开始生成设计方案...')
+    setStatusMessage(language === 'zh' ? '开始生成设计方案...' : 'Starting design generation...')
 
     try {
-      // Step 1: 如果有上传图片但还没有分析，先分析
-      let analysisId = analysisResult?.id
+      // Step 1: 如果有上传图片，先分析
+      let analysisId: string | undefined = undefined
 
-      if (uploadedImage && !analysisId) {
-        setStatusMessage('正在分析房间照片...')
+      if (uploadedImage) {
+        setStatusMessage(language === 'zh' ? '正在分析房间照片...' : 'Analyzing room photo...')
         setProgress(10)
         
         // 将base64转为File
@@ -131,9 +163,9 @@ export function DesignResults() {
         let analysisComplete = false
         while (!analysisComplete) {
           await new Promise(resolve => setTimeout(resolve, 2000))
-          const status = await analysisApi.getStatus(analysisId)
+          const status = await analysisApi.getStatus(analysisId!)
           setProgress(10 + Math.min(status.progress * 0.3, 30))
-          setStatusMessage(`分析中... ${status.progress}%`)
+          setStatusMessage(language === 'zh' ? `分析中... ${status.progress}%` : `Analyzing... ${status.progress}%`)
           
           if (status.status === 'completed') {
             analysisComplete = true
@@ -144,7 +176,7 @@ export function DesignResults() {
       }
 
       // Step 2: 调用设计生成API
-      setStatusMessage('正在生成设计方案...')
+      setStatusMessage(language === 'zh' ? '正在生成设计方案...' : 'Generating design...')
       setProgress(40)
       
       const designResult = await designApi.generate(analysisId || 'demo', {
@@ -155,7 +187,7 @@ export function DesignResults() {
         requirements: preferences?.requirements || [],
         color_preference: preferences?.colorPreference || [],
         special_needs: preferences?.specialNeeds || '',
-      })
+      }, language)
 
       const jobId = designResult.id
       currentJobIdRef.current = jobId // Track current job
@@ -171,13 +203,13 @@ export function DesignResults() {
           setProgress(currentProgress)
           
           if (status.progress < 30) {
-            setStatusMessage('正在分析设计需求...')
+            setStatusMessage(language === 'zh' ? '正在分析设计需求...' : 'Analyzing requirements...')
           } else if (status.progress < 60) {
-            setStatusMessage('正在生成设计理念...')
+            setStatusMessage(language === 'zh' ? '正在生成设计理念...' : 'Generating concepts...')
           } else if (status.progress < 90) {
-            setStatusMessage('正在渲染效果图...')
+            setStatusMessage(language === 'zh' ? '正在渲染效果图...' : 'Rendering images...')
           } else {
-            setStatusMessage('正在匹配家具产品...')
+            setStatusMessage(language === 'zh' ? '正在匹配家具产品...' : 'Matching furniture...')
           }
           
           if (status.status === 'completed' && status.proposals) {
@@ -210,7 +242,7 @@ export function DesignResults() {
             setProgress(100)
             setDesigns(convertedDesigns)
             setSelectedDesign(convertedDesigns[0])
-            toast.success('设计方案生成完成！')
+            toast.success(language === 'zh' ? '设计方案生成完成！' : 'Design generation complete!')
           } else if (status.status === 'failed') {
             throw new Error(status.error || '设计生成失败')
           }
@@ -230,16 +262,17 @@ export function DesignResults() {
       const isConnectionError = err.code === 'ECONNREFUSED' || err.message?.includes('Network Error') || err.message?.includes('timeout')
       
       if (isConnectionError) {
-        toast.error('无法连接到后端服务器，请确保后端服务正在运行', {
+        toast.error(language === 'zh' ? '无法连接到后端服务器' : 'Cannot connect to backend server', {
           duration: 5000,
         })
       } else {
         // Use fallback data for other errors
-        toast.error(`生成失败: ${errorMessage}，显示示例方案`, {
+        toast.error(language === 'zh' ? `生成失败: ${errorMessage}` : `Generation failed: ${errorMessage}`, {
           duration: 5000,
         })
       }
       
+      const fallbackDesigns = fallbackDesignsData[language] as DesignProposal[]
       setDesigns(fallbackDesigns)
       setSelectedDesign(fallbackDesigns[0])
     } finally {
@@ -271,7 +304,87 @@ export function DesignResults() {
     )
   }
 
-  const { language, t } = useLanguage()
+  const texts = {
+    zh: {
+      generating: 'AI正在为您创作设计方案...',
+      analyzingPhoto: '正在分析房间照片...',
+      generatingDesign: '正在生成设计方案...',
+      progress: '生成进度',
+      steps: ['分析设计需求', '生成设计理念', '渲染效果图', '匹配家具产品'],
+      generated: '已生成',
+      proposals: '个设计方案',
+      yourDesign: '您的专属设计方案',
+      designList: '设计方案',
+      match: '匹配度',
+      preview: '效果预览',
+      shoppingList: '购物清单',
+      original: '原始照片',
+      designEffect: '设计效果',
+      preview3D: '3D预览',
+      download: '下载方案',
+      share: '分享',
+      save: '保存',
+      regenerate: '重新生成',
+      totalCost: '预估总费用',
+      withinBudget: '在您的预算范围内！还剩余',
+      overBudget: '超出预算',
+      downloadPDF: '下载完整购物清单 (PDF)',
+      buy: '购买',
+      shareTitle: '分享设计方案',
+      copyLink: '复制链接',
+      preparing: '正在准备下载...',
+      downloadSuccess: '下载成功！',
+      downloadFailed: '下载失败，请重试',
+      linkCopied: '链接已复制到剪贴板！',
+      copyFailed: '复制失败',
+      savedAccount: '设计已保存到您的账户！',
+      savedLocal: '设计已保存到本地历史！',
+      saveFailed: '保存失败',
+      generateSuccess: '设计方案生成完成！',
+      connectionError: '无法连接到后端服务器，请确保后端服务正在运行',
+      generateFailed: '生成失败，显示示例方案',
+    },
+    en: {
+      generating: 'AI is creating your design...',
+      analyzingPhoto: 'Analyzing room photo...',
+      generatingDesign: 'Generating design...',
+      progress: 'Progress',
+      steps: ['Analyzing requirements', 'Generating concepts', 'Rendering images', 'Matching furniture'],
+      generated: 'Generated',
+      proposals: 'design proposals',
+      yourDesign: 'Your Custom Design',
+      designList: 'Designs',
+      match: 'Match',
+      preview: 'Preview',
+      shoppingList: 'Shopping List',
+      original: 'Original Photo',
+      designEffect: 'Design Effect',
+      preview3D: '3D Preview',
+      download: 'Download',
+      share: 'Share',
+      save: 'Save',
+      regenerate: 'Regenerate',
+      totalCost: 'Estimated Total',
+      withinBudget: 'Within budget! Remaining:',
+      overBudget: 'Over budget by',
+      downloadPDF: 'Download Shopping List (PDF)',
+      buy: 'Buy',
+      shareTitle: 'Share Design',
+      copyLink: 'Copy Link',
+      preparing: 'Preparing download...',
+      downloadSuccess: 'Download successful!',
+      downloadFailed: 'Download failed, please retry',
+      linkCopied: 'Link copied to clipboard!',
+      copyFailed: 'Copy failed',
+      savedAccount: 'Design saved to your account!',
+      savedLocal: 'Design saved to local history!',
+      saveFailed: 'Save failed',
+      generateSuccess: 'Design generation complete!',
+      connectionError: 'Cannot connect to backend server',
+      generateFailed: 'Generation failed, showing sample designs',
+    }
+  }
+  const txt = texts[language]
   
   // Use CAD formatting
   const formatCurrency = (value: number) => {
@@ -289,7 +402,7 @@ export function DesignResults() {
     if (!selectedDesign) return
     
     try {
-      toast.loading('正在准备下载...')
+      toast.loading(language === 'zh' ? '正在准备下载...' : 'Preparing download...')
       
       // Fetch the image
       const response = await fetch(selectedDesign.image)
@@ -299,17 +412,17 @@ export function DesignResults() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${selectedDesign.name}-设计方案.png`
+      a.download = `${selectedDesign.name}-design.png`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
       window.URL.revokeObjectURL(url)
       
       toast.dismiss()
-      toast.success('下载成功！')
+      toast.success(language === 'zh' ? '下载成功！' : 'Download successful!')
     } catch (err) {
       toast.dismiss()
-      toast.error('下载失败，请重试')
+      toast.error(language === 'zh' ? '下载失败，请重试' : 'Download failed, please retry')
     }
   }
 
@@ -334,9 +447,9 @@ export function DesignResults() {
   const copyShareLink = async () => {
     try {
       await navigator.clipboard.writeText(shareLink)
-      toast.success('链接已复制到剪贴板！')
+      toast.success(language === 'zh' ? '链接已复制到剪贴板！' : 'Link copied to clipboard!')
     } catch (err) {
-      toast.error('复制失败')
+      toast.error(language === 'zh' ? '复制失败' : 'Copy failed')
     }
   }
 
@@ -409,7 +522,7 @@ export function DesignResults() {
         </motion.div>
         
         <h2 className="text-2xl font-display font-bold mb-4">
-          AI正在为您创作设计方案...
+          {txt.generating}
         </h2>
         <p className="text-slate-600 max-w-md mb-2">
           {statusMessage}
@@ -418,7 +531,7 @@ export function DesignResults() {
         {/* 进度条 */}
         <div className="w-full max-w-md mt-6">
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-slate-600">生成进度</span>
+            <span className="text-slate-600">{txt.progress}</span>
             <span className="text-blue-600 font-medium">{Math.round(progress)}%</span>
           </div>
           <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
@@ -432,12 +545,7 @@ export function DesignResults() {
         </div>
 
         <div className="mt-8 flex flex-col gap-3 w-full max-w-sm">
-          {[
-            { label: '分析设计需求', threshold: 20 },
-            { label: '生成设计理念', threshold: 45 },
-            { label: '渲染效果图', threshold: 70 },
-            { label: '匹配家具产品', threshold: 90 },
-          ].map((step, i) => (
+          {txt.steps.map((label, i) => ({ label, threshold: [20, 45, 70, 90][i] })).map((step, i) => (
             <motion.div 
               key={step.label} 
               className="text-left"
@@ -486,15 +594,15 @@ export function DesignResults() {
           className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4"
         >
           <Check className="w-4 h-4" />
-          已生成 {designs.length} 个设计方案
+          {txt.generated} {designs.length} {txt.proposals}
         </motion.div>
-        <h2 className="text-3xl font-display font-bold">您的专属设计方案</h2>
+        <h2 className="text-3xl font-display font-bold">{txt.yourDesign}</h2>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Design thumbnails */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-slate-700">设计方案</h3>
+          <h3 className="font-semibold text-slate-700">{txt.designList}</h3>
           {designs.map((design, index) => (
             <motion.button
               key={design.id}
@@ -544,7 +652,7 @@ export function DesignResults() {
                       {formatCurrency(design.totalCost)}
                     </span>
                     <span className="text-xs text-slate-400">
-                      匹配度 {Math.round(design.confidence * 100)}%
+                      {txt.match} {Math.round(design.confidence * 100)}%
                     </span>
                   </div>
                 </div>
@@ -569,7 +677,7 @@ export function DesignResults() {
                 `}
               >
                 <Eye className="w-4 h-4 inline mr-2" />
-                效果预览
+                {txt.preview}
               </button>
               <button
                 onClick={() => setActiveTab('furniture')}
@@ -582,7 +690,7 @@ export function DesignResults() {
                 `}
               >
                 <ShoppingCart className="w-4 h-4 inline mr-2" />
-                购物清单
+                {txt.shoppingList}
               </button>
             </div>
 
@@ -598,7 +706,7 @@ export function DesignResults() {
                   {/* Before/After comparison */}
                   <div className="grid md:grid-cols-2 gap-4 mb-6">
                     <div>
-                      <span className="text-sm font-medium text-slate-500 mb-2 block">原始照片</span>
+                      <span className="text-sm font-medium text-slate-500 mb-2 block">{txt.original}</span>
                       <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
                         {uploadedImage ? (
                           <img 
@@ -608,13 +716,13 @@ export function DesignResults() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-400">
-                            <span>您上传的房间照片</span>
+                            <span>{language === 'zh' ? '您上传的房间照片' : 'Your uploaded room photo'}</span>
                           </div>
                         )}
                       </div>
                     </div>
                     <div>
-                      <span className="text-sm font-medium text-slate-500 mb-2 block">设计效果</span>
+                      <span className="text-sm font-medium text-slate-500 mb-2 block">{txt.designEffect}</span>
                       <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
                         <img 
                           src={selectedDesign.image} 
@@ -650,35 +758,35 @@ export function DesignResults() {
                         className="btn-primary flex items-center gap-2"
                       >
                         <Box className="w-5 h-5" />
-                        3D预览
+                        {txt.preview3D}
                       </button>
                       <button 
                         onClick={handleDownload}
                         className="btn-secondary flex items-center gap-2"
                       >
                         <Download className="w-5 h-5" />
-                        下载方案
+                        {txt.download}
                       </button>
                       <button 
                         onClick={handleShare}
                         className="btn-ghost flex items-center gap-2"
                       >
                         <Share2 className="w-5 h-5" />
-                        分享
+                        {txt.share}
                       </button>
                       <button 
                         onClick={saveToHistory}
                         className="btn-ghost flex items-center gap-2"
                       >
                         <Save className="w-5 h-5" />
-                        保存
+                        {txt.save}
                       </button>
                       <button 
                         onClick={handleRegenerate}
                         className="btn-ghost flex items-center gap-2"
                       >
                         <RefreshCw className="w-5 h-5" />
-                        重新生成
+                        {txt.regenerate}
                       </button>
                     </div>
                   </div>
@@ -745,7 +853,7 @@ export function DesignResults() {
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-colors"
                             >
-                              购买 <ExternalLink className="w-3 h-3" />
+                              {txt.buy} <ExternalLink className="w-3 h-3" />
                             </a>
                           ) : null}
                         </div>
@@ -755,7 +863,7 @@ export function DesignResults() {
 
                   {/* Total */}
                   <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl flex items-center justify-between">
-                    <span className="font-semibold text-slate-700">预估总费用</span>
+                    <span className="font-semibold text-slate-700">{txt.totalCost}</span>
                     <span className="text-2xl font-bold text-blue-600">
                       {formatCurrency(selectedDesign.totalCost)}
                     </span>
@@ -771,11 +879,11 @@ export function DesignResults() {
                       {selectedDesign.totalCost <= preferences.budget ? (
                         <>
                           <Check className="w-5 h-5" />
-                          <span>在您的预算范围内！还剩余 {formatCurrency(preferences.budget - selectedDesign.totalCost)}</span>
+                          <span>{txt.withinBudget} {formatCurrency(preferences.budget - selectedDesign.totalCost)}</span>
                         </>
                       ) : (
                         <>
-                          <span>超出预算 {formatCurrency(selectedDesign.totalCost - preferences.budget)}</span>
+                          <span>{txt.overBudget} {formatCurrency(selectedDesign.totalCost - preferences.budget)}</span>
                         </>
                       )}
                     </div>
@@ -784,7 +892,7 @@ export function DesignResults() {
                   {/* Download shopping list */}
                   <button className="mt-6 w-full btn-primary justify-center">
                     <Download className="w-5 h-5 mr-2" />
-                    下载完整购物清单 (PDF)
+                    {txt.downloadPDF}
                   </button>
                 </motion.div>
               )}
@@ -812,7 +920,7 @@ export function DesignResults() {
             className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold">分享设计方案</h3>
+              <h3 className="text-xl font-bold">{txt.shareTitle}</h3>
               <button
                 onClick={() => setShowShareModal(false)}
                 className="p-2 hover:bg-slate-100 rounded-full"
@@ -822,7 +930,7 @@ export function DesignResults() {
             </div>
             
             <p className="text-slate-600 mb-4">
-              复制下方链接分享给朋友，他们可以查看您的设计方案
+              {language === 'zh' ? '复制下方链接分享给朋友，他们可以查看您的设计方案' : 'Copy the link below to share with friends'}
             </p>
             
             <div className="flex gap-2">
@@ -842,7 +950,7 @@ export function DesignResults() {
             
             <div className="mt-4 flex gap-2">
               <button
-                onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent('看看我用AI设计的房间！')}`, '_blank')}
+                onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(language === 'zh' ? '看看我用AI设计的房间！' : 'Check out my AI-designed room!')}`, '_blank')}
                 className="flex-1 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors"
               >
                 Twitter
@@ -857,7 +965,7 @@ export function DesignResults() {
                 onClick={() => window.open(`weixin://`, '_blank')}
                 className="flex-1 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
               >
-                微信
+                {language === 'zh' ? '微信' : 'WeChat'}
               </button>
             </div>
           </motion.div>

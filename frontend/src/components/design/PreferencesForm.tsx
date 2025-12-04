@@ -11,30 +11,70 @@ import {
   Plus
 } from 'lucide-react'
 import { useDesignStore } from '@/store/designStore'
+import { useLanguage } from '@/lib/i18n'
 
 const colorOptions = [
-  { id: 'neutral', name: '中性色', colors: ['#FFFFFF', '#E5E5E5', '#8B8B8B', '#2D2D2D'] },
-  { id: 'warm', name: '暖色调', colors: ['#FFF5E6', '#FFB347', '#D2691E', '#8B4513'] },
-  { id: 'cool', name: '冷色调', colors: ['#E6F3FF', '#87CEEB', '#4682B4', '#1E3A5F'] },
-  { id: 'earth', name: '大地色', colors: ['#F5F5DC', '#C4A77D', '#8B7355', '#556B2F'] },
-  { id: 'pastel', name: '糖果色', colors: ['#FFE4E1', '#E0BBE4', '#957DAD', '#D4A5A5'] },
-  { id: 'bold', name: '鲜艳色', colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96C93D'] },
+  { id: 'neutral', name: '中性色', nameEn: 'Neutral', colors: ['#FFFFFF', '#E5E5E5', '#8B8B8B', '#2D2D2D'] },
+  { id: 'warm', name: '暖色调', nameEn: 'Warm', colors: ['#FFF5E6', '#FFB347', '#D2691E', '#8B4513'] },
+  { id: 'cool', name: '冷色调', nameEn: 'Cool', colors: ['#E6F3FF', '#87CEEB', '#4682B4', '#1E3A5F'] },
+  { id: 'earth', name: '大地色', nameEn: 'Earth', colors: ['#F5F5DC', '#C4A77D', '#8B7355', '#556B2F'] },
+  { id: 'pastel', name: '糖果色', nameEn: 'Pastel', colors: ['#FFE4E1', '#E0BBE4', '#957DAD', '#D4A5A5'] },
+  { id: 'bold', name: '鲜艳色', nameEn: 'Bold', colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96C93D'] },
 ]
 
 const requirementOptions = [
-  { id: 'workspace', label: '工作区域', icon: '💻' },
-  { id: 'gaming', label: '游戏空间', icon: '🎮' },
-  { id: 'reading', label: '阅读角落', icon: '📚' },
-  { id: 'pet', label: '宠物友好', icon: '🐱' },
-  { id: 'kids', label: '儿童安全', icon: '👶' },
-  { id: 'storage', label: '更多收纳', icon: '📦' },
-  { id: 'plants', label: '绿植空间', icon: '🌿' },
-  { id: 'entertainment', label: '娱乐中心', icon: '📺' },
+  { id: 'workspace', label: '工作区域', labelEn: 'Workspace' },
+  { id: 'gaming', label: '游戏空间', labelEn: 'Gaming' },
+  { id: 'reading', label: '阅读角落', labelEn: 'Reading' },
+  { id: 'pet', label: '宠物友好', labelEn: 'Pet-friendly' },
+  { id: 'kids', label: '儿童安全', labelEn: 'Kid-safe' },
+  { id: 'storage', label: '更多收纳', labelEn: 'Storage' },
+  { id: 'plants', label: '绿植空间', labelEn: 'Plants' },
+  { id: 'entertainment', label: '娱乐中心', labelEn: 'Entertainment' },
 ]
 
 export function PreferencesForm() {
   const { preferences, updatePreferences, analysis } = useDesignStore()
+  const { language } = useLanguage()
   const [newFurniture, setNewFurniture] = useState('')
+
+  const texts = {
+    zh: {
+      colorTitle: '色彩偏好',
+      colorSubtitle: '选择您喜欢的色调',
+      keepTitle: '保留家具',
+      keepSubtitle: '选择需要保留的现有家具',
+      addFurniture: '添加其他家具...',
+      reqTitle: '特殊需求',
+      reqSubtitle: '选择空间功能需求',
+      furnitureTitle: '家具意见（AI必采纳）',
+      furnitureSubtitle: '您的具体要求会直接影响渲染效果',
+      furnitureTip: '在这里描述您想要的具体家具和布置，AI会在渲染时采纳您的意见。例如：',
+      furnitureExamples: ['我想要一个L型大沙发', '靠窗放一张书桌和椅子', '电视墙要简洁大气', '需要很多绿植装饰'],
+      furniturePlaceholder: '在这里描述您想要的具体家具、布置方式、装饰品等，AI会根据您的描述进行渲染...',
+      notesTitle: '其他补充说明',
+      notesSubtitle: '风格偏好、颜色禁忌等',
+      notesPlaceholder: '例如：不喜欢太深的颜色，希望整体明亮通透...',
+    },
+    en: {
+      colorTitle: 'Color Preferences',
+      colorSubtitle: 'Select your preferred tones',
+      keepTitle: 'Keep Furniture',
+      keepSubtitle: 'Select furniture to keep',
+      addFurniture: 'Add other furniture...',
+      reqTitle: 'Special Requirements',
+      reqSubtitle: 'Select space function needs',
+      furnitureTitle: 'Furniture Suggestions (AI Will Follow)',
+      furnitureSubtitle: 'Your specific requirements will directly affect the rendering',
+      furnitureTip: 'Describe the specific furniture and layout you want, AI will follow your suggestions:',
+      furnitureExamples: ['I want an L-shaped sofa', 'Put a desk and chair by the window', 'Simple and elegant TV wall', 'Add lots of plants'],
+      furniturePlaceholder: 'Describe specific furniture, layout, decorations you want...',
+      notesTitle: 'Additional Notes',
+      notesSubtitle: 'Style preferences, color restrictions, etc.',
+      notesPlaceholder: 'e.g. Prefer bright colors, keep it minimal...',
+    }
+  }
+  const txt = texts[language]
 
   const toggleColorPreference = (colorId: string) => {
     const current = preferences.colorPreference || []
@@ -80,8 +120,8 @@ export function PreferencesForm() {
             <Palette className="w-5 h-5 text-terracotta-600" />
           </div>
           <div>
-            <h3 className="font-bold text-lg">色彩偏好</h3>
-            <p className="text-sm text-warmgray-500">选择您喜欢的色调</p>
+            <h3 className="font-bold text-lg">{txt.colorTitle}</h3>
+            <p className="text-sm text-warmgray-500">{txt.colorSubtitle}</p>
           </div>
         </div>
 
@@ -115,7 +155,7 @@ export function PreferencesForm() {
                 ))}
               </div>
               <span className="text-sm font-medium text-warmgray-700">
-                {option.name}
+                {language === 'zh' ? option.name : option.nameEn}
               </span>
             </motion.button>
           ))}
@@ -130,8 +170,8 @@ export function PreferencesForm() {
               <Sofa className="w-5 h-5 text-ocean-600" />
             </div>
             <div>
-              <h3 className="font-bold text-lg">保留家具</h3>
-              <p className="text-sm text-warmgray-500">选择需要保留的现有家具</p>
+              <h3 className="font-bold text-lg">{txt.keepTitle}</h3>
+              <p className="text-sm text-warmgray-500">{txt.keepSubtitle}</p>
             </div>
           </div>
 
@@ -160,7 +200,7 @@ export function PreferencesForm() {
               type="text"
               value={newFurniture}
               onChange={(e) => setNewFurniture(e.target.value)}
-              placeholder="添加其他家具..."
+              placeholder={txt.addFurniture}
               className="input-primary flex-1"
               onKeyPress={(e) => e.key === 'Enter' && addCustomFurniture()}
             />
@@ -181,8 +221,8 @@ export function PreferencesForm() {
             <Target className="w-5 h-5 text-forest-600" />
           </div>
           <div>
-            <h3 className="font-bold text-lg">特殊需求</h3>
-            <p className="text-sm text-warmgray-500">选择空间功能需求</p>
+            <h3 className="font-bold text-lg">{txt.reqTitle}</h3>
+            <p className="text-sm text-warmgray-500">{txt.reqSubtitle}</p>
           </div>
         </div>
 
@@ -201,9 +241,8 @@ export function PreferencesForm() {
                 }
               `}
             >
-              <span className="text-2xl mb-2 block">{req.icon}</span>
               <span className="text-sm font-medium text-warmgray-700">
-                {req.label}
+                {language === 'zh' ? req.label : req.labelEn}
               </span>
             </motion.button>
           ))}
@@ -217,27 +256,26 @@ export function PreferencesForm() {
             <Sofa className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h3 className="font-bold text-lg">🎯 家具意见（AI必采纳）</h3>
-            <p className="text-sm text-blue-600 font-medium">您的具体要求会直接影响渲染效果</p>
+            <h3 className="font-bold text-lg">{txt.furnitureTitle}</h3>
+            <p className="text-sm text-blue-600 font-medium">{txt.furnitureSubtitle}</p>
           </div>
         </div>
 
         <div className="bg-blue-50 rounded-xl p-4 mb-4">
           <p className="text-sm text-blue-800">
-            <strong>提示：</strong>在这里描述您想要的具体家具和布置，AI会在渲染时采纳您的意见。例如：
+            <strong>{language === 'zh' ? '提示：' : 'Tip: '}</strong>{txt.furnitureTip}
           </p>
           <ul className="text-sm text-blue-700 mt-2 space-y-1">
-            <li>• "我想要一个L型大沙发"</li>
-            <li>• "靠窗放一张书桌和椅子"</li>
-            <li>• "电视墙要简洁大气"</li>
-            <li>• "需要很多绿植装饰"</li>
+            {txt.furnitureExamples.map((ex: string, i: number) => (
+              <li key={i}>- {ex}</li>
+            ))}
           </ul>
         </div>
 
         <textarea
           value={preferences.specialNeeds || ''}
           onChange={(e) => updatePreferences('specialNeeds', e.target.value)}
-          placeholder="在这里描述您想要的具体家具、布置方式、装饰品等，AI会根据您的描述进行渲染..."
+          placeholder={txt.furniturePlaceholder}
           rows={5}
           className="input-primary resize-none border-blue-200 focus:ring-blue-500"
         />
@@ -250,15 +288,15 @@ export function PreferencesForm() {
             <MessageSquare className="w-5 h-5 text-slate-600" />
           </div>
           <div>
-            <h3 className="font-bold text-lg">其他补充说明</h3>
-            <p className="text-sm text-slate-500">风格偏好、颜色禁忌等</p>
+            <h3 className="font-bold text-lg">{txt.notesTitle}</h3>
+            <p className="text-sm text-slate-500">{txt.notesSubtitle}</p>
           </div>
         </div>
 
         <textarea
           value={preferences.additionalNotes || ''}
           onChange={(e) => updatePreferences('additionalNotes', e.target.value)}
-          placeholder="例如：不喜欢太深的颜色，希望整体明亮通透..."
+          placeholder={txt.notesPlaceholder}
           rows={3}
           className="input-primary resize-none"
         />

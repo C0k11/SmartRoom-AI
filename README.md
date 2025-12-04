@@ -219,9 +219,9 @@ npx eas-cli build --platform ios
 7. **Generate Designs** - AI generates multiple design proposals
 8. **View Results** - 3D preview, download, share
 
-## Screenshots
+## Demo
 
-(Coming soon)
+![SmartRoom-AI Demo](./AI%20Room%20Designer.gif)
 
 ## Future Plans
 

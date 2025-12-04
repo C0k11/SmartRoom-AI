@@ -95,6 +95,7 @@ async def generate_designs(
     # Extract from dict
     analysis_id = request.get("analysis_id", "demo")
     preferences = request.get("preferences", {})
+    language = request.get("language", "zh")  # Get language parameter
     
     # Handle style - can be string or object with id
     style_raw = preferences.get("style", "modern")
@@ -131,6 +132,7 @@ async def generate_designs(
         "analysis_id": analysis_id,
         "preferences": normalized_prefs,
         "source_image": source_image,  # Store source image for img2img
+        "language": language,  # Store language for generation
         "proposals": None,
         "error": None,
     }
@@ -156,9 +158,10 @@ async def process_design_generation(job_id: str):
         job["progress"] = 10
         
         preferences = job["preferences"]
+        language = job.get("language", "zh")
         
         # Step 1: Generate design concepts
-        logger.info(f"Generating design concepts for job {job_id}")
+        logger.info(f"Generating design concepts for job {job_id} in language: {language}")
         job["progress"] = 20
         
         # Combine all user requirements for strict adherence
@@ -173,6 +176,7 @@ async def process_design_generation(job_id: str):
             requirements=preferences.get("requirements", []),
             special_needs=all_user_requirements,
             room_description=preferences.get("room_description", ""),
+            language=language,
         )
         job["progress"] = 40
         
@@ -209,6 +213,7 @@ async def process_design_generation(job_id: str):
                 user_needs=user_needs,
                 region="CA",  # TODO: detect from IP
                 exclude=preferences.get("keep_furniture", []),
+                language=language,
             )
             
             total_cost = sum(f["price"] for f in furniture)

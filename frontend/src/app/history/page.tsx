@@ -15,7 +15,7 @@ import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
 import { useAuth } from '@/lib/auth'
 import { userApi } from '@/lib/api'
-import { formatCAD } from '@/lib/i18n'
+import { formatCAD, useLanguage } from '@/lib/i18n'
 import toast from 'react-hot-toast'
 
 interface HistoryItem {
@@ -31,8 +31,47 @@ interface HistoryItem {
 
 export default function HistoryPage() {
   const { isAuthenticated, isLoading } = useAuth()
+  const { language } = useLanguage()
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null)
+
+  const texts = {
+    zh: {
+      loginFirst: '请先登录',
+      goLogin: '去登录',
+      backDesign: '返回设计',
+      title: '设计历史',
+      subtitle: '查看您保存的所有设计方案',
+      clearAll: '清空历史',
+      noHistory: '暂无历史记录',
+      noHistoryDesc: '您还没有保存任何设计方案',
+      startDesign: '开始设计',
+      deleted: '已删除',
+      deleteFailed: '删除失败',
+      confirmClear: '确定要清空所有历史记录吗？',
+      cleared: '历史记录已清空',
+      downloadSuccess: '下载成功',
+      downloadFailed: '下载失败',
+    },
+    en: {
+      loginFirst: 'Please Login',
+      goLogin: 'Login',
+      backDesign: 'Back to Design',
+      title: 'Design History',
+      subtitle: 'View all your saved designs',
+      clearAll: 'Clear All',
+      noHistory: 'No History',
+      noHistoryDesc: 'You haven\'t saved any designs yet',
+      startDesign: 'Start Design',
+      deleted: 'Deleted',
+      deleteFailed: 'Delete failed',
+      confirmClear: 'Are you sure you want to clear all history?',
+      cleared: 'History cleared',
+      downloadSuccess: 'Download successful',
+      downloadFailed: 'Download failed',
+    }
+  }
+  const txt = texts[language]
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -98,18 +137,18 @@ export default function HistoryPage() {
       const updated = history.filter(h => h.id !== id)
       setHistory(updated)
       localStorage.setItem('designHistory', JSON.stringify(updated))
-      toast.success('已删除')
+      toast.success(txt.deleted)
     } catch (error) {
       console.error('Failed to delete design:', error)
-      toast.error('删除失败')
+      toast.error(txt.deleteFailed)
     }
   }
 
   const clearAll = () => {
-    if (confirm('确定要清空所有历史记录吗？')) {
+    if (confirm(txt.confirmClear)) {
       setHistory([])
       localStorage.removeItem('designHistory')
-      toast.success('历史记录已清空')
+      toast.success(txt.cleared)
     }
   }
 
@@ -125,9 +164,9 @@ export default function HistoryPage() {
       a.click()
       document.body.removeChild(a)
       window.URL.revokeObjectURL(url)
-      toast.success('下载成功')
+      toast.success(txt.downloadSuccess)
     } catch (err) {
-      toast.error('下载失败')
+      toast.error(txt.downloadFailed)
     }
   }
 
@@ -145,9 +184,9 @@ export default function HistoryPage() {
         <Header />
         <main className="pt-28 pb-16">
           <div className="container mx-auto px-6 text-center">
-            <h1 className="text-2xl font-bold mb-4">请先登录</h1>
+            <h1 className="text-2xl font-bold mb-4">{txt.loginFirst}</h1>
             <Link href="/login" className="btn-primary">
-              去登录
+              {txt.goLogin}
             </Link>
           </div>
         </main>
@@ -165,7 +204,7 @@ export default function HistoryPage() {
           <div className="mb-8">
             <Link href="/design" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              返回设计
+              {txt.backDesign}
             </Link>
           </div>
 
@@ -174,10 +213,10 @@ export default function HistoryPage() {
             <div>
               <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
                 <Clock className="w-8 h-8 text-blue-500" />
-                设计历史
+                {txt.title}
               </h1>
               <p className="text-slate-600 mt-2">
-                查看您保存的所有设计方案
+                {txt.subtitle}
               </p>
             </div>
             
@@ -187,7 +226,7 @@ export default function HistoryPage() {
                 className="btn-ghost text-red-600 hover:bg-red-50"
               >
                 <Trash2 className="w-5 h-5 mr-2" />
-                清空历史
+                {txt.clearAll}
               </button>
             )}
           </div>
@@ -195,10 +234,10 @@ export default function HistoryPage() {
           {history.length === 0 ? (
             <div className="text-center py-16">
               <Clock className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-slate-600 mb-2">暂无历史记录</h2>
-              <p className="text-slate-500 mb-6">您还没有保存任何设计方案</p>
+              <h2 className="text-xl font-semibold text-slate-600 mb-2">{txt.noHistory}</h2>
+              <p className="text-slate-500 mb-6">{txt.noHistoryDesc}</p>
               <Link href="/design" className="btn-primary">
-                开始设计
+                {txt.startDesign}
               </Link>
             </div>
           ) : (

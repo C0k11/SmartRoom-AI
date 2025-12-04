@@ -69,7 +69,7 @@ export default function DesignPage() {
       analysisTitle: '房间分析',
       analysisDesc: 'AI将识别房间类型、现有家具和设计潜力',
       tips: {
-        title: '📸 拍照小贴士',
+        title: '拍照建议',
         items: ['尽量拍摄房间的全景', '保持照片水平，避免倾斜', '确保光线充足', '清理杂物，展示真实布局']
       },
       styleTitle: '选择设计风格',
@@ -95,7 +95,7 @@ export default function DesignPage() {
       analysisTitle: 'Room Analysis',
       analysisDesc: 'AI will identify room type, furniture, and design potential',
       tips: {
-        title: '📸 Photo Tips',
+        title: 'Photo Tips',
         items: ['Capture full room view', 'Keep photo level', 'Ensure good lighting', 'Clear clutter, show real layout']
       },
       styleTitle: 'Choose Design Style',
@@ -122,8 +122,8 @@ export default function DesignPage() {
       // Call real API for room analysis
       const { analysisApi } = await import('@/lib/api')
       
-      // Upload image to backend
-      const uploadResult = await analysisApi.uploadImage(file)
+      // Upload image to backend with current language
+      const uploadResult = await analysisApi.uploadImage(file, language)
       const jobId = uploadResult.id
       
       // Poll for analysis result
@@ -293,7 +293,7 @@ export default function DesignPage() {
           <div className="mb-8">
             <Link href="/" className="inline-flex items-center gap-2 text-warmgray-500 hover:text-terracotta-600 transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              返回首页
+              {txt.backHome}
             </Link>
           </div>
 
@@ -353,9 +353,9 @@ export default function DesignPage() {
                 >
                   {/* Upload Section */}
                   <div>
-                    <h2 className="text-2xl font-display font-bold mb-2">上传房间照片</h2>
+                    <h2 className="text-2xl font-display font-bold mb-2">{txt.uploadTitle}</h2>
                     <p className="text-warmgray-600 mb-6">
-                      上传一张清晰的房间照片，AI将自动分析房间布局和特征
+                      {txt.uploadDesc}
                     </p>
                     
                     <ImageUploader
@@ -365,38 +365,39 @@ export default function DesignPage() {
                       onRemove={handleRemoveImage}
                     />
 
-                    {/* Room Description - 房间自定义词条 */}
-                    <div className="mt-6 p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
-                      <h4 className="font-semibold text-blue-800 mb-2">🏠 房间描述（帮助AI更准确分析）</h4>
+                    {/* Room Description */}
+                    <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                      <h4 className="font-semibold text-blue-800 mb-2">
+                        {language === 'zh' ? '房间描述（可选）' : 'Room Description (Optional)'}
+                      </h4>
                       <p className="text-sm text-blue-600 mb-3">
-                        描述这个房间的实际情况，AI会结合您的描述进行分析和设计
+                        {language === 'zh' ? '描述房间情况，帮助AI更准确分析' : 'Describe the room to help AI analyze better'}
                       </p>
                       <textarea
                         value={preferences.roomDescription || ''}
                         onChange={(e) => updatePreferences('roomDescription', e.target.value)}
-                        placeholder="例如：这是一个带窗户的空仓库，水泥地面，准备改造成农具存放间..."
+                        placeholder={language === 'zh' ? '例如：空仓库，水泥地面，准备改造成存放间...' : 'e.g. Empty warehouse, concrete floor, converting to storage...'}
                         rows={3}
-                        className="w-full px-4 py-3 rounded-xl border-2 border-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm"
+                        className="w-full px-4 py-3 rounded-xl border border-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm"
                       />
                     </div>
 
                     {/* Tips */}
-                    <div className="mt-4 p-4 bg-ocean-50 rounded-xl border border-ocean-100">
-                      <h4 className="font-semibold text-ocean-800 mb-2">📸 拍照小贴士</h4>
-                      <ul className="text-sm text-ocean-700 space-y-1">
-                        <li>• 尽量拍摄房间的全景</li>
-                        <li>• 保持照片水平，避免倾斜</li>
-                        <li>• 确保光线充足</li>
-                        <li>• 清理杂物，展示真实布局</li>
+                    <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="font-semibold text-slate-700 mb-2">{txt.tips.title}</h4>
+                      <ul className="text-sm text-slate-600 space-y-1">
+                        {txt.tips.items.map((item: string, i: number) => (
+                          <li key={i}>- {item}</li>
+                        ))}
                       </ul>
                     </div>
                   </div>
 
                   {/* Analysis Result */}
                   <div>
-                    <h2 className="text-2xl font-display font-bold mb-2">房间分析</h2>
+                    <h2 className="text-2xl font-display font-bold mb-2">{txt.analysisTitle}</h2>
                     <p className="text-warmgray-600 mb-6">
-                      AI将识别房间类型、现有家具和设计潜力
+                      {txt.analysisDesc}
                     </p>
                     
                     <AnalysisResult 
@@ -415,9 +416,9 @@ export default function DesignPage() {
                   exit={{ opacity: 0, x: -20 }}
                 >
                   <div className="text-center mb-10">
-                    <h2 className="text-3xl font-display font-bold mb-2">选择设计风格</h2>
+                    <h2 className="text-3xl font-display font-bold mb-2">{txt.styleTitle}</h2>
                     <p className="text-warmgray-600">
-                      选择您喜欢的设计风格，AI将基于此生成多个设计方案
+                      {txt.styleDesc}
                     </p>
                   </div>
                   
@@ -433,9 +434,9 @@ export default function DesignPage() {
                   exit={{ opacity: 0, x: -20 }}
                 >
                   <div className="text-center mb-10">
-                    <h2 className="text-3xl font-display font-bold mb-2">设置您的偏好</h2>
+                    <h2 className="text-3xl font-display font-bold mb-2">{txt.prefTitle}</h2>
                     <p className="text-warmgray-600">
-                      告诉我们您的预算和特殊需求
+                      {txt.prefDesc}
                     </p>
                   </div>
                   
@@ -473,7 +474,7 @@ export default function DesignPage() {
                   `}
                 >
                   <ArrowLeft className="w-5 h-5" />
-                  上一步
+                  {txt.prev}
                 </button>
 
                 <button
@@ -490,11 +491,11 @@ export default function DesignPage() {
                   {currentStep === 3 ? (
                     <>
                       <Sparkles className="w-5 h-5" />
-                      生成设计方案
+                      {txt.generate}
                     </>
                   ) : (
                     <>
-                      下一步
+                      {txt.next}
                       <ArrowRight className="w-5 h-5" />
                     </>
                   )}
