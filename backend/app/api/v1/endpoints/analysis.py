@@ -55,11 +55,13 @@ analysis_jobs: dict = {}
 async def upload_room_image(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
+    language: str = "zh",
 ):
     """
     Upload room photo and start analysis
     
     - **file**: Room photo file (JPG, PNG, WebP)
+    - **language**: Response language ("zh" or "en")
     
     Returns job ID for polling analysis results
     """
@@ -95,12 +97,13 @@ async def upload_room_image(
         "progress": 0,
         "image_url": file_url,
         "image_data": base64.b64encode(content).decode("utf-8"),
+        "language": language,
         "result": None,
         "error": None,
     }
     
     # Start background analysis
-    background_tasks.add_task(process_analysis, job_id)
+    background_tasks.add_task(process_analysis, job_id, language)
     
     return {
         "id": job_id,
@@ -109,7 +112,7 @@ async def upload_room_image(
     }
 
 
-async def process_analysis(job_id: str):
+async def process_analysis(job_id: str, language: str = "zh"):
     """Background task to process room analysis"""
     try:
         job = analysis_jobs.get(job_id)
@@ -121,10 +124,10 @@ async def process_analysis(job_id: str):
         job["progress"] = 10
         
         # Step 1: GPT-4 Vision Analysis
-        logger.info(f"Starting GPT-4 Vision analysis for job {job_id}")
+        logger.info(f"Starting GPT-4 Vision analysis for job {job_id} (language: {language})")
         job["progress"] = 20
         
-        analysis_result = await vision_service.analyze_room(job["image_data"])
+        analysis_result = await vision_service.analyze_room(job["image_data"], language)
         job["progress"] = 50
         
         # Step 2: SAM Segmentation (optional)

@@ -17,35 +17,36 @@ import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { formatCurrency } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 
 const categories = [
-  { id: 'all', name: '全部', icon: '🏠' },
-  { id: 'sofa', name: '沙发', icon: '🛋️' },
-  { id: 'table', name: '桌子', icon: '🪑' },
-  { id: 'chair', name: '椅子', icon: '💺' },
-  { id: 'bed', name: '床', icon: '🛏️' },
-  { id: 'storage', name: '收纳', icon: '📦' },
-  { id: 'lighting', name: '灯具', icon: '💡' },
-  { id: 'decor', name: '装饰', icon: '🖼️' },
-  { id: 'rug', name: '地毯', icon: '🧶' },
+  { id: 'all', name: '全部', nameEn: 'All' },
+  { id: 'sofa', name: '沙发', nameEn: 'Sofa' },
+  { id: 'table', name: '桌子', nameEn: 'Table' },
+  { id: 'chair', name: '椅子', nameEn: 'Chair' },
+  { id: 'bed', name: '床', nameEn: 'Bed' },
+  { id: 'storage', name: '收纳', nameEn: 'Storage' },
+  { id: 'lighting', name: '灯具', nameEn: 'Lighting' },
+  { id: 'decor', name: '装饰', nameEn: 'Decor' },
+  { id: 'rug', name: '地毯', nameEn: 'Rug' },
 ]
 
 const styles = [
-  { id: 'all', name: '全部风格' },
-  { id: 'modern', name: '现代简约' },
-  { id: 'nordic', name: '北欧' },
-  { id: 'japanese', name: '日式' },
-  { id: 'industrial', name: '工业风' },
-  { id: 'bohemian', name: '波西米亚' },
+  { id: 'all', name: '全部风格', nameEn: 'All Styles' },
+  { id: 'modern', name: '现代简约', nameEn: 'Modern' },
+  { id: 'nordic', name: '北欧', nameEn: 'Nordic' },
+  { id: 'japanese', name: '日式', nameEn: 'Japanese' },
+  { id: 'industrial', name: '工业风', nameEn: 'Industrial' },
+  { id: 'bohemian', name: '波西米亚', nameEn: 'Bohemian' },
 ]
 
 const brands = [
-  { id: 'all', name: '全部品牌' },
-  { id: 'ikea', name: 'IKEA' },
-  { id: 'muji', name: 'MUJI' },
-  { id: 'hay', name: 'HAY' },
-  { id: 'yuanshimuyu', name: '源氏木语' },
-  { id: 'muzhigongfang', name: '木智工坊' },
+  { id: 'all', name: '全部品牌', nameEn: 'All Brands' },
+  { id: 'ikea', name: 'IKEA', nameEn: 'IKEA' },
+  { id: 'muji', name: 'MUJI', nameEn: 'MUJI' },
+  { id: 'hay', name: 'HAY', nameEn: 'HAY' },
+  { id: 'yuanshimuyu', name: '源氏木语', nameEn: 'Yuanshi Wood' },
+  { id: 'muzhigongfang', name: '木智工坊', nameEn: 'Muzhi Studio' },
 ]
 
 // Mock furniture data
@@ -233,6 +234,7 @@ const mockFurniture = [
 ]
 
 export default function FurniturePage() {
+  const { language } = useLanguage()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedStyle, setSelectedStyle] = useState('all')
@@ -241,6 +243,54 @@ export default function FurniturePage() {
   const [sortBy, setSortBy] = useState('popular')
   const [showFilters, setShowFilters] = useState(false)
   const [favorites, setFavorites] = useState<string[]>([])
+
+  const texts = {
+    zh: {
+      title: '家具商城',
+      subtitle: '精选高品质家具，让设计方案变为现实',
+      search: '搜索家具名称、品牌...',
+      filter: '筛选',
+      style: '风格',
+      brand: '品牌',
+      priceRange: '价格范围',
+      found: '找到',
+      items: '件商品',
+      outOfStock: '缺货',
+      addToList: '加入清单',
+      dimensions: '尺寸',
+      noResults: '没有找到匹配的商品',
+      tryAdjust: '尝试调整筛选条件或搜索关键词',
+      clearFilter: '清除筛选',
+      popular: '最受欢迎',
+      priceLow: '价格从低到高',
+      priceHigh: '价格从高到低',
+      topRated: '评分最高',
+      mostReviews: '评论最多',
+    },
+    en: {
+      title: 'Furniture Store',
+      subtitle: 'Quality furniture to bring your designs to life',
+      search: 'Search furniture, brands...',
+      filter: 'Filter',
+      style: 'Style',
+      brand: 'Brand',
+      priceRange: 'Price Range',
+      found: 'Found',
+      items: 'items',
+      outOfStock: 'Out of Stock',
+      addToList: 'Add to List',
+      dimensions: 'Size',
+      noResults: 'No matching products found',
+      tryAdjust: 'Try adjusting filters or search keywords',
+      clearFilter: 'Clear Filters',
+      popular: 'Most Popular',
+      priceLow: 'Price: Low to High',
+      priceHigh: 'Price: High to Low',
+      topRated: 'Top Rated',
+      mostReviews: 'Most Reviews',
+    }
+  }
+  const txt = texts[language]
 
   const filteredFurniture = mockFurniture.filter(item => {
     const matchesSearch = !searchQuery || 
@@ -289,7 +339,7 @@ export default function FurniturePage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-4xl md:text-5xl font-display font-bold mb-4"
             >
-              家具商城
+              {txt.title}
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -297,7 +347,7 @@ export default function FurniturePage() {
               transition={{ delay: 0.1 }}
               className="text-lg text-warmgray-600"
             >
-              精选高品质家具，让设计方案变为现实
+              {txt.subtitle}
             </motion.p>
           </div>
 
@@ -309,7 +359,7 @@ export default function FurniturePage() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-warmgray-400" />
                 <input
                   type="text"
-                  placeholder="搜索家具名称、品牌..."
+                  placeholder={txt.search}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="input-primary pl-12"
@@ -324,11 +374,11 @@ export default function FurniturePage() {
                   className="input-primary pr-10 appearance-none bg-no-repeat bg-right"
                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundSize: '1.5rem' }}
                 >
-                  <option value="popular">最受欢迎</option>
-                  <option value="price-low">价格从低到高</option>
-                  <option value="price-high">价格从高到低</option>
-                  <option value="rating">评分最高</option>
-                  <option value="reviews">评论最多</option>
+                  <option value="popular">{txt.popular}</option>
+                  <option value="price-low">{txt.priceLow}</option>
+                  <option value="price-high">{txt.priceHigh}</option>
+                  <option value="rating">{txt.topRated}</option>
+                  <option value="reviews">{txt.mostReviews}</option>
                 </select>
 
                 <button
@@ -336,7 +386,7 @@ export default function FurniturePage() {
                   className={`btn-secondary flex items-center gap-2 ${showFilters ? 'bg-terracotta-50 text-terracotta-600' : ''}`}
                 >
                   <SlidersHorizontal className="w-5 h-5" />
-                  筛选
+                  {txt.filter}
                 </button>
               </div>
             </div>
@@ -351,32 +401,32 @@ export default function FurniturePage() {
               >
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-warmgray-700 mb-2">风格</label>
+                    <label className="block text-sm font-medium text-warmgray-700 mb-2">{txt.style}</label>
                     <select
                       value={selectedStyle}
                       onChange={(e) => setSelectedStyle(e.target.value)}
                       className="input-primary"
                     >
                       {styles.map(style => (
-                        <option key={style.id} value={style.id}>{style.name}</option>
+                        <option key={style.id} value={style.id}>{language === 'zh' ? style.name : style.nameEn}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-warmgray-700 mb-2">品牌</label>
+                    <label className="block text-sm font-medium text-warmgray-700 mb-2">{txt.brand}</label>
                     <select
                       value={selectedBrand}
                       onChange={(e) => setSelectedBrand(e.target.value)}
                       className="input-primary"
                     >
                       {brands.map(brand => (
-                        <option key={brand.id} value={brand.id}>{brand.name}</option>
+                        <option key={brand.id} value={brand.id}>{language === 'zh' ? brand.name : brand.nameEn}</option>
                       ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-warmgray-700 mb-2">
-                      价格范围: {formatCurrency(priceRange[0])} - {formatCurrency(priceRange[1])}
+                      {txt.priceRange}: {formatCurrency(priceRange[0])} - {formatCurrency(priceRange[1])}
                     </label>
                     <input
                       type="range"
@@ -405,15 +455,14 @@ export default function FurniturePage() {
                     : 'bg-white text-warmgray-600 hover:bg-warmgray-100'
                 }`}
               >
-                <span>{category.icon}</span>
-                <span>{category.name}</span>
+                <span>{language === 'zh' ? category.name : category.nameEn}</span>
               </button>
             ))}
           </div>
 
           {/* Results count */}
           <div className="text-warmgray-500 mb-6">
-            找到 {sortedFurniture.length} 件商品
+            {txt.found} {sortedFurniture.length} {txt.items}
           </div>
 
           {/* Product Grid */}
@@ -444,7 +493,7 @@ export default function FurniturePage() {
                     )}
                     {!item.inStock && (
                       <span className="px-2 py-1 bg-warmgray-500 text-white text-xs font-medium rounded-full">
-                        缺货
+                        {txt.outOfStock}
                       </span>
                     )}
                   </div>
@@ -467,7 +516,7 @@ export default function FurniturePage() {
                   <div className="absolute bottom-3 left-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button className="flex-1 py-2 bg-terracotta-500 text-white text-sm font-medium rounded-lg hover:bg-terracotta-600 transition-colors flex items-center justify-center gap-1">
                       <ShoppingCart className="w-4 h-4" />
-                      加入清单
+                      {txt.addToList}
                     </button>
                     <a
                       href="#"
@@ -509,7 +558,7 @@ export default function FurniturePage() {
                   
                   {/* Dimensions */}
                   <div className="text-xs text-warmgray-500 mt-2">
-                    尺寸: {item.dimensions}
+                    {txt.dimensions}: {item.dimensions}
                   </div>
                 </div>
               </motion.div>
@@ -523,10 +572,10 @@ export default function FurniturePage() {
                 <Search className="w-8 h-8 text-warmgray-400" />
               </div>
               <h3 className="text-xl font-semibold text-warmgray-700 mb-2">
-                没有找到匹配的商品
+                {txt.noResults}
               </h3>
               <p className="text-warmgray-500 mb-4">
-                尝试调整筛选条件或搜索关键词
+                {txt.tryAdjust}
               </p>
               <button
                 onClick={() => {
@@ -538,7 +587,7 @@ export default function FurniturePage() {
                 }}
                 className="btn-secondary"
               >
-                清除筛选
+                {txt.clearFilter}
               </button>
             </div>
           )}

@@ -90,6 +90,7 @@ class DesignService:
         special_needs: str = "",
         room_description: str = "",
         num_concepts: int = 3,
+        language: str = "zh",
     ) -> List[dict]:
         """
         Generate design concepts based on style and requirements
@@ -99,14 +100,15 @@ class DesignService:
             requirements: List of special requirements
             special_needs: Additional notes from user
             num_concepts: Number of concepts to generate
+            language: Output language (zh or en)
             
         Returns:
             List of design concept dictionaries
         """
         requirements = requirements or []
         
-        # Style-specific design concepts
-        concept_templates = {
+        # Style-specific design concepts - Chinese
+        concept_templates_zh = {
             "modern": [
                 {
                     "name": "都市极简",
@@ -201,6 +203,102 @@ class DesignService:
             ],
         }
         
+        # Style-specific design concepts - English
+        concept_templates_en = {
+            "modern": [
+                {
+                    "name": "Urban Minimalist",
+                    "description": "Clean lines and neutral tones create an efficient living space for urban professionals",
+                    "highlights": ["Minimalist Design", "Functional Focus", "Premium Materials"],
+                    "prompt": "ultra modern minimalist interior, clean geometric lines, monochromatic palette, high-end finishes",
+                    "confidence": 0.95,
+                },
+                {
+                    "name": "Modern Warmth",
+                    "description": "Modern design infused with warm elements, balancing aesthetics and comfort",
+                    "highlights": ["Warm Atmosphere", "Comfortable Textiles", "Human-centered Design"],
+                    "prompt": "modern warm interior design, soft textures, warm lighting, comfortable furniture",
+                    "confidence": 0.92,
+                },
+                {
+                    "name": "Artistic Modern",
+                    "description": "Transform your space into an art gallery showcasing unique taste",
+                    "highlights": ["Artistic Elements", "Personal Expression", "Visual Focal Points"],
+                    "prompt": "modern artistic interior, gallery-like space, statement art pieces, designer furniture",
+                    "confidence": 0.88,
+                },
+            ],
+            "nordic": [
+                {
+                    "name": "Nordic Sunlight",
+                    "description": "Bright and airy Scandinavian style, letting natural light take center stage",
+                    "highlights": ["Natural Light", "White Base", "Wood Textures"],
+                    "prompt": "bright scandinavian interior, white walls, large windows, natural wood floors, hygge atmosphere",
+                    "confidence": 0.94,
+                },
+                {
+                    "name": "Nordic Forest",
+                    "description": "Bring the tranquility of the forest indoors, creating a natural habitat",
+                    "highlights": ["Natural Elements", "Plant Decor", "Organic Materials"],
+                    "prompt": "nordic forest interior, indoor plants, natural materials, wooden furniture, green accents",
+                    "confidence": 0.91,
+                },
+                {
+                    "name": "Nordic Cozy",
+                    "description": "The ultimate expression of Hygge style, a warm and cozy retreat",
+                    "highlights": ["Warm Textiles", "Candle Ambiance", "Cozy Corners"],
+                    "prompt": "hygge scandinavian interior, cozy textiles, candles, reading nook, warm blankets",
+                    "confidence": 0.93,
+                },
+            ],
+            "japanese": [
+                {
+                    "name": "Zen Space",
+                    "description": "Japanese Zen aesthetics creating a meditation-like peaceful atmosphere",
+                    "highlights": ["Minimalism", "Zen Arrangement", "Natural Materials"],
+                    "prompt": "japanese zen interior, minimal furniture, tatami elements, shoji screens, rock garden view",
+                    "confidence": 0.92,
+                },
+                {
+                    "name": "Modern Japanese",
+                    "description": "Perfect fusion of traditional Japanese and modern design",
+                    "highlights": ["Traditional Elements", "Modern Function", "Harmonious Unity"],
+                    "prompt": "modern japanese interior, contemporary furniture with traditional elements, paper lanterns, bonsai",
+                    "confidence": 0.90,
+                },
+                {
+                    "name": "Wood Warmth",
+                    "description": "Wood takes center stage, feeling the warmth of nature",
+                    "highlights": ["Natural Wood", "Organic Texture", "Warm Ambiance"],
+                    "prompt": "japanese wood interior, natural wood throughout, warm tones, minimalist design, natural light",
+                    "confidence": 0.89,
+                },
+            ],
+            "industrial": [
+                {
+                    "name": "Industrial Classic",
+                    "description": "Exposed brick and metal pipes recreate the raw beauty of the industrial era",
+                    "highlights": ["Exposed Materials", "Metal Elements", "Vintage Industrial"],
+                    "prompt": "classic industrial interior, exposed brick walls, metal pipes, concrete floors, vintage lighting",
+                    "confidence": 0.93,
+                },
+                {
+                    "name": "Industrial Warmth",
+                    "description": "Industrial style infused with warm elements, balancing strength and softness",
+                    "highlights": ["Leather Furniture", "Warm Accents", "Mixed Styles"],
+                    "prompt": "warm industrial interior, leather furniture, warm wood accents, soft lighting, cozy textiles",
+                    "confidence": 0.90,
+                },
+                {
+                    "name": "Urban Loft",
+                    "description": "Open loft space for free-spirited urban living",
+                    "highlights": ["Open Space", "High Ceilings", "Functional Zones"],
+                    "prompt": "urban loft interior, open floor plan, high ceilings, industrial elements, modern furniture",
+                    "confidence": 0.91,
+                },
+            ],
+        }
+        
         # Get base concepts for style
         style_key = style.lower().replace(" ", "").replace("简约", "modern").replace("北欧", "nordic").replace("日式", "japanese").replace("工业", "industrial")
         
@@ -219,6 +317,8 @@ class DesignService:
         if style in style_mapping:
             style_key = style_mapping[style]
         
+        # Select template based on language
+        concept_templates = concept_templates_en if language == "en" else concept_templates_zh
         concepts = concept_templates.get(style_key, concept_templates["modern"])
         
         # Check if user has strong custom requirements - if so, OVERRIDE default prompts
@@ -274,7 +374,8 @@ class DesignService:
                         f"{user_prompt}, "
                         f"interior photograph, realistic lighting, photorealistic, 8k"
                     )
-                concept["highlights"] = ["用户定制空间", "保留原始基底"] + concept.get("highlights", [])[:2]
+                custom_highlights = ["Custom Space", "Original Structure"] if language == "en" else ["用户定制空间", "保留原始基底"]
+                concept["highlights"] = custom_highlights + concept.get("highlights", [])[:2]
                 logger.info(f"Override concept prompt (preserve_base={not wants_base_change}): {concept['prompt'][:150]}...")
         
         # Adjust concepts based on ALL user requirements - AI MUST follow user's furniture preferences
@@ -285,19 +386,19 @@ class DesignService:
                     req_lower = req.lower() if isinstance(req, str) else str(req).lower()
                     
                     if "workspace" in req_lower or "work" in req_lower or "办公" in req_lower or "工作" in req_lower:
-                        concept["highlights"].append("办公区域")
+                        concept["highlights"].append("Workspace" if language == "en" else "办公区域")
                         concept["prompt"] += ", dedicated workspace area with desk and ergonomic chair"
                     
                     if "plants" in req_lower or "绿植" in req_lower or "植物" in req_lower:
-                        concept["highlights"].append("绿植装饰")
+                        concept["highlights"].append("Plant Decor" if language == "en" else "绿植装饰")
                         concept["prompt"] += ", abundant indoor plants, large potted plants, hanging greenery"
                     
                     if "storage" in req_lower or "收纳" in req_lower or "储物" in req_lower:
-                        concept["highlights"].append("智能收纳")
+                        concept["highlights"].append("Smart Storage" if language == "en" else "智能收纳")
                         concept["prompt"] += ", smart storage solutions, built-in shelving"
                     
                     if "reading" in req_lower or "阅读" in req_lower or "书" in req_lower:
-                        concept["highlights"].append("阅读角落")
+                        concept["highlights"].append("Reading Nook" if language == "en" else "阅读角落")
                         concept["prompt"] += ", cozy reading nook with bookshelf and comfortable armchair"
                     
                     if "sofa" in req_lower or "沙发" in req_lower:
@@ -320,7 +421,7 @@ class DesignService:
                     
                     # Computer/PC related requirements
                     if "computer" in req_lower or "pc" in req_lower or "电脑" in req_lower or "计算机" in req_lower:
-                        concept["highlights"].append("电脑设备")
+                        concept["highlights"].append("Computer Setup" if language == "en" else "电脑设备")
                         concept["prompt"] += ", desktop computers, computer monitors, modern PC setup"
                     
                     if "很多" in req_lower and ("电脑" in req_lower or "计算机" in req_lower):
@@ -328,7 +429,7 @@ class DesignService:
             
             # IMPORTANT: Add brand-specific prompts if not already handled by custom requirements
             if special_needs and special_needs.strip() and not has_custom_requirements:
-                concept["highlights"].append("用户定制")
+                concept["highlights"].append("Custom" if language == "en" else "用户定制")
                 special_needs_clean = special_needs.strip()
                 
                 # Detect and enhance brand mentions in special needs

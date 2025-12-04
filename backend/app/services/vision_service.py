@@ -10,7 +10,7 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 
-ROOM_ANALYSIS_PROMPT = """
+ROOM_ANALYSIS_PROMPT_ZH = """
 分析这张室内照片,提供以下信息(以JSON格式返回):
 
 {
@@ -28,7 +28,28 @@ ROOM_ANALYSIS_PROMPT = """
   "confidence": "分析置信度(0-1之间的数字)"
 }
 
-请确保返回有效的JSON格式。对于dimensions中的数值,请只返回数字,不要包含单位。
+请确保返回有效的JSON格式。对于dimensions中的数值,请只返回数字,不要包含单位。所有文字描述请用中文。
+"""
+
+ROOM_ANALYSIS_PROMPT_EN = """
+Analyze this interior photo and provide the following information (return as JSON):
+
+{
+  "room_type": "room type (living/bedroom/kitchen/bathroom/office/dining/other)",
+  "dimensions": {
+    "width": "estimated width in meters (number only)",
+    "length": "estimated length in meters (number only)",
+    "height": "estimated ceiling height in meters (number only)"
+  },
+  "existing_furniture": ["list of existing furniture"],
+  "current_style": "description of current interior style",
+  "lighting": "description of lighting conditions",
+  "problems": ["list of identified issues"],
+  "potential": "analysis of renovation potential",
+  "confidence": "analysis confidence (number between 0-1)"
+}
+
+Please ensure valid JSON format. For dimension values, return numbers only without units. All text descriptions should be in English.
 """
 
 
@@ -49,29 +70,30 @@ class VisionService:
         else:
             logger.warning("No API key configured, using mock data")
     
-    async def analyze_room(self, image_base64: str) -> dict:
+    async def analyze_room(self, image_base64: str, language: str = "zh") -> dict:
         """
         Analyze room image using Claude or OpenAI Vision
         
         Args:
             image_base64: Base64 encoded image data
+            language: Language for response ("zh" or "en")
             
         Returns:
             Room analysis result dictionary
         """
         # Try Claude first
         if self.anthropic_client:
-            return await self._analyze_with_claude(image_base64)
+            return await self._analyze_with_claude(image_base64, language)
         
         # Fallback to OpenAI
         if self.openai_client:
-            return await self._analyze_with_openai(image_base64)
+            return await self._analyze_with_openai(image_base64, language)
         
         # Return mock data if no API configured
         logger.warning("No API client available, returning mock data")
-        return self._get_mock_analysis()
+        return self._get_mock_analysis(language)
     
-    async def _analyze_with_claude(self, image_base64: str) -> dict:
+    async def _analyze_with_claude(self, image_base64: str, language: str = "zh") -> dict:
         """Analyze room using Claude 3.5 Sonnet"""
         try:
             # Determine media type
@@ -82,6 +104,9 @@ class VisionService:
                 media_type = "image/png"
             elif image_base64.startswith("UklGR"):
                 media_type = "image/webp"
+            
+            # Select prompt based on language
+            prompt = ROOM_ANALYSIS_PROMPT_ZH if language == "zh" else ROOM_ANALYSIS_PROMPT_EN
             
             message = self.anthropic_client.messages.create(
                 model=settings.CLAUDE_MODEL,
@@ -100,7 +125,7 @@ class VisionService:
                             },
                             {
                                 "type": "text",
-                                "text": ROOM_ANALYSIS_PROMPT,
+                                "text": prompt,
                             }
                         ],
                     }
@@ -110,15 +135,18 @@ class VisionService:
             # Parse response
             content = message.content[0].text
             result = self._extract_json(content)
-            return self._validate_analysis(result)
+            return self._validate_analysis(result, language)
             
         except Exception as e:
             logger.error(f"Claude vision analysis failed: {e}")
             raise
     
-    async def _analyze_with_openai(self, image_base64: str) -> dict:
+    async def _analyze_with_openai(self, image_base64: str, language: str = "zh") -> dict:
         """Analyze room using OpenAI GPT-4 Vision"""
         try:
+            # Select prompt based on language
+            prompt = ROOM_ANALYSIS_PROMPT_ZH if language == "zh" else ROOM_ANALYSIS_PROMPT_EN
+            
             response = await self.openai_client.chat.completions.create(
                 model=settings.OPENAI_MODEL,
                 messages=[
@@ -127,7 +155,7 @@ class VisionService:
                         "content": [
                             {
                                 "type": "text",
-                                "text": ROOM_ANALYSIS_PROMPT,
+                                "text": prompt,
                             },
                             {
                                 "type": "image_url",
@@ -144,7 +172,7 @@ class VisionService:
             
             content = response.choices[0].message.content
             result = self._extract_json(content)
-            return self._validate_analysis(result)
+            return self._validate_analysis(result, language)
             
         except Exception as e:
             logger.error(f"OpenAI vision analysis failed: {e}")
@@ -178,9 +206,9 @@ class VisionService:
         
         raise ValueError("Could not extract JSON from response")
     
-    def _validate_analysis(self, result: dict) -> dict:
+    def _validate_analysis(self, result: dict, language: str = "zh") -> dict:
         """Validate and normalize analysis result"""
-        defaults = {
+        defaults_zh = {
             "room_type": "living",
             "dimensions": {"width": 4.0, "length": 5.0, "height": 2.8},
             "existing_furniture": [],
@@ -190,6 +218,19 @@ class VisionService:
             "potential": "有改造空间",
             "confidence": 0.7,
         }
+        
+        defaults_en = {
+            "room_type": "living",
+            "dimensions": {"width": 4.0, "length": 5.0, "height": 2.8},
+            "existing_furniture": [],
+            "current_style": "Unknown",
+            "lighting": "Normal",
+            "problems": [],
+            "potential": "Has renovation potential",
+            "confidence": 0.7,
+        }
+        
+        defaults = defaults_zh if language == "zh" else defaults_en
         
         for key, default in defaults.items():
             if key not in result:
@@ -208,22 +249,38 @@ class VisionService:
         
         return result
     
-    def _get_mock_analysis(self) -> dict:
+    def _get_mock_analysis(self, language: str = "zh") -> dict:
         """Return mock analysis data for development"""
-        return {
-            "room_type": "living",
-            "dimensions": {
-                "width": 5.5,
-                "length": 4.2,
-                "height": 2.8,
-            },
-            "existing_furniture": ["沙发", "茶几", "电视柜", "书架"],
-            "current_style": "现代简约",
-            "lighting": "自然光充足，东向窗户",
-            "problems": ["空间利用不足", "色彩单调", "缺乏装饰元素"],
-            "potential": "可以通过添加绿植、艺术画和调整家具布局来提升空间感",
-            "confidence": 0.92,
-        }
+        if language == "zh":
+            return {
+                "room_type": "living",
+                "dimensions": {
+                    "width": 5.5,
+                    "length": 4.2,
+                    "height": 2.8,
+                },
+                "existing_furniture": ["沙发", "茶几", "电视柜", "书架"],
+                "current_style": "现代简约",
+                "lighting": "自然光充足，东向窗户",
+                "problems": ["空间利用不足", "色彩单调", "缺乏装饰元素"],
+                "potential": "可以通过添加绿植、艺术画和调整家具布局来提升空间感",
+                "confidence": 0.92,
+            }
+        else:
+            return {
+                "room_type": "living",
+                "dimensions": {
+                    "width": 5.5,
+                    "length": 4.2,
+                    "height": 2.8,
+                },
+                "existing_furniture": ["Sofa", "Coffee Table", "TV Stand", "Bookshelf"],
+                "current_style": "Modern Minimalist",
+                "lighting": "Natural light sufficient, east-facing windows",
+                "problems": ["Underutilized space", "Monotone colors", "Lack of decorative elements"],
+                "potential": "Can improve space by adding plants, artwork, and adjusting furniture layout",
+                "confidence": 0.92,
+            }
 
 
 # Design prompt generation

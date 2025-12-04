@@ -37,11 +37,11 @@ api.interceptors.response.use(
 
 // Analysis API
 export const analysisApi = {
-  uploadImage: async (file: File) => {
+  uploadImage: async (file: File, language: string = 'zh') => {
     const formData = new FormData()
     formData.append('file', file)
     
-    const response = await api.post('/analysis/upload', formData, {
+    const response = await api.post(`/analysis/upload?language=${language}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -62,10 +62,11 @@ export const analysisApi = {
 
 // Design API
 export const designApi = {
-  generate: async (analysisId: string, preferences: any) => {
+  generate: async (analysisId: string, preferences: any, language: string = 'zh') => {
     const response = await api.post('/design/generate', {
       analysis_id: analysisId,
       preferences,
+      language,
     })
     return response.data
   },
