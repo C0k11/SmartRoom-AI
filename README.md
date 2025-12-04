@@ -2,6 +2,10 @@
 
 AI-Powered Interior Design Assistant - Upload a room photo, select a style, get professional design proposals in seconds.
 
+## Demo
+
+![SmartRoom-AI Demo](./AI%20Room%20Designer.gif)
+
 ## Overview
 
 SmartRoom-AI is an intelligent interior design assistant powered by artificial intelligence. Users simply upload a room photo, select their preferred style, and the AI automatically analyzes room features and generates multiple professional design proposals with matching furniture recommendations.
@@ -218,10 +222,6 @@ npx eas-cli build --platform ios
 6. **Add Suggestions** - Specify desired furniture/brands
 7. **Generate Designs** - AI generates multiple design proposals
 8. **View Results** - 3D preview, download, share
-
-## Demo
-
-![SmartRoom-AI Demo](./AI%20Room%20Designer.gif)
 
 ## Future Plans
 
