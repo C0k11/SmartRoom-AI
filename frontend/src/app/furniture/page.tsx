@@ -1,329 +1,583 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { 
-  Search, 
-  Filter, 
-  Heart,
-  ShoppingCart,
-  Star,
-  ExternalLink,
-  SlidersHorizontal,
-  X,
-  ChevronDown
+  ExternalLink, 
+  Sofa,
+  Lamp,
+  BedDouble,
+  Armchair,
+  Frame,
+  LayoutGrid,
+  Store,
+  ChevronRight,
+  Globe,
+  ShoppingBag
 } from 'lucide-react'
-import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import { formatCurrency } from '@/lib/utils'
 import { useLanguage } from '@/lib/i18n'
 
-const categories = [
-  { id: 'all', name: '全部', nameEn: 'All' },
-  { id: 'sofa', name: '沙发', nameEn: 'Sofa' },
-  { id: 'table', name: '桌子', nameEn: 'Table' },
-  { id: 'chair', name: '椅子', nameEn: 'Chair' },
-  { id: 'bed', name: '床', nameEn: 'Bed' },
-  { id: 'storage', name: '收纳', nameEn: 'Storage' },
-  { id: 'lighting', name: '灯具', nameEn: 'Lighting' },
-  { id: 'decor', name: '装饰', nameEn: 'Decor' },
-  { id: 'rug', name: '地毯', nameEn: 'Rug' },
+// Region configurations
+const regions = [
+  { id: 'cn', name: '中国', nameEn: 'China', flag: '🇨🇳' },
+  { id: 'ca', name: '加拿大', nameEn: 'Canada', flag: '🇨🇦' },
+  { id: 'jp', name: '日本', nameEn: 'Japan', flag: '🇯🇵' },
 ]
 
-const styles = [
-  { id: 'all', name: '全部风格', nameEn: 'All Styles' },
-  { id: 'modern', name: '现代简约', nameEn: 'Modern' },
-  { id: 'nordic', name: '北欧', nameEn: 'Nordic' },
-  { id: 'japanese', name: '日式', nameEn: 'Japanese' },
-  { id: 'industrial', name: '工业风', nameEn: 'Industrial' },
-  { id: 'bohemian', name: '波西米亚', nameEn: 'Bohemian' },
+// China platforms
+const chinaPlatforms = [
+  {
+    id: 'taobao',
+    name: '淘宝',
+    nameZh: '淘宝',
+    logo: 'https://img.alicdn.com/favicon.ico',
+    color: 'from-orange-500 to-orange-600',
+    bgColor: 'bg-orange-50',
+    textColor: 'text-orange-600',
+    description: '海量商品，价格实惠',
+    descriptionEn: 'Massive selection, affordable prices',
+    baseUrl: 'https://www.taobao.com',
+    categories: [
+      { name: '全部家具', nameEn: 'All Furniture', url: 'https://s.taobao.com/search?q=家具', icon: LayoutGrid },
+      { name: '沙发', nameEn: 'Sofas', url: 'https://s.taobao.com/search?q=沙发', icon: Sofa },
+      { name: '床', nameEn: 'Beds', url: 'https://s.taobao.com/search?q=床', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://s.taobao.com/search?q=椅子', icon: Armchair },
+      { name: '桌子', nameEn: 'Tables', url: 'https://s.taobao.com/search?q=桌子 书桌', icon: Frame },
+      { name: '灯具', nameEn: 'Lighting', url: 'https://s.taobao.com/search?q=灯具 台灯 落地灯', icon: Lamp },
+      { name: '收纳柜', nameEn: 'Storage', url: 'https://s.taobao.com/search?q=收纳柜 书架', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'jd',
+    name: '京东',
+    nameZh: '京东',
+    logo: 'https://www.jd.com/favicon.ico',
+    color: 'from-red-600 to-red-700',
+    bgColor: 'bg-red-50',
+    textColor: 'text-red-600',
+    description: '品质保证，快速配送',
+    descriptionEn: 'Quality assured, fast delivery',
+    baseUrl: 'https://www.jd.com',
+    categories: [
+      { name: '全部家具', nameEn: 'All Furniture', url: 'https://channel.jd.com/furniture.html', icon: LayoutGrid },
+      { name: '沙发', nameEn: 'Sofas', url: 'https://search.jd.com/Search?keyword=沙发&enc=utf-8', icon: Sofa },
+      { name: '床', nameEn: 'Beds', url: 'https://search.jd.com/Search?keyword=床&enc=utf-8', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://search.jd.com/Search?keyword=椅子&enc=utf-8', icon: Armchair },
+      { name: '桌子', nameEn: 'Tables', url: 'https://search.jd.com/Search?keyword=书桌&enc=utf-8', icon: Frame },
+      { name: '灯具', nameEn: 'Lighting', url: 'https://search.jd.com/Search?keyword=灯具&enc=utf-8', icon: Lamp },
+      { name: '收纳', nameEn: 'Storage', url: 'https://search.jd.com/Search?keyword=收纳柜&enc=utf-8', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'tmall',
+    name: '天猫',
+    nameZh: '天猫',
+    logo: 'https://www.tmall.com/favicon.ico',
+    color: 'from-red-500 to-pink-500',
+    bgColor: 'bg-pink-50',
+    textColor: 'text-pink-600',
+    description: '品牌旗舰店，正品保障',
+    descriptionEn: 'Brand flagship stores, authentic products',
+    baseUrl: 'https://www.tmall.com',
+    categories: [
+      { name: '全部家具', nameEn: 'All Furniture', url: 'https://list.tmall.com/search_product.htm?q=家具', icon: LayoutGrid },
+      { name: '沙发', nameEn: 'Sofas', url: 'https://list.tmall.com/search_product.htm?q=沙发', icon: Sofa },
+      { name: '床', nameEn: 'Beds', url: 'https://list.tmall.com/search_product.htm?q=床', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://list.tmall.com/search_product.htm?q=椅子', icon: Armchair },
+      { name: '桌子', nameEn: 'Tables', url: 'https://list.tmall.com/search_product.htm?q=书桌', icon: Frame },
+      { name: '灯具', nameEn: 'Lighting', url: 'https://list.tmall.com/search_product.htm?q=灯具', icon: Lamp },
+      { name: '收纳', nameEn: 'Storage', url: 'https://list.tmall.com/search_product.htm?q=收纳柜', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'ikea',
+    name: 'IKEA',
+    nameZh: '宜家中国',
+    logo: 'https://www.ikea.cn/etc.clientlibs/ikea/clientlibs/clientlib-site/resources/favicons/favicon-32x32.png',
+    color: 'from-blue-500 to-yellow-500',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-600',
+    description: '瑞典家居品牌，简约北欧风格',
+    descriptionEn: 'Swedish home furnishing, Nordic style',
+    baseUrl: 'https://www.ikea.cn',
+    categories: [
+      { name: '全部家具', nameEn: 'All Furniture', url: 'https://www.ikea.cn/cn/zh/cat/furniture-fu001/', icon: LayoutGrid },
+      { name: '沙发', nameEn: 'Sofas', url: 'https://www.ikea.cn/cn/zh/cat/sofas-fu003/', icon: Sofa },
+      { name: '床', nameEn: 'Beds', url: 'https://www.ikea.cn/cn/zh/cat/beds-bm003/', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://www.ikea.cn/cn/zh/cat/chairs-fu002/', icon: Armchair },
+      { name: '桌子', nameEn: 'Tables', url: 'https://www.ikea.cn/cn/zh/cat/tables-desks-fu004/', icon: Frame },
+      { name: '灯具', nameEn: 'Lighting', url: 'https://www.ikea.cn/cn/zh/cat/lighting-li001/', icon: Lamp },
+      { name: '收纳', nameEn: 'Storage', url: 'https://www.ikea.cn/cn/zh/cat/storage-furniture-st001/', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'yuanshimuyu',
+    name: '源氏木语',
+    nameZh: '源氏木语',
+    logo: '',
+    color: 'from-amber-600 to-amber-800',
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
+    description: '原木家具，匠心品质',
+    descriptionEn: 'Solid wood furniture, craftsman quality',
+    baseUrl: 'https://yuanshimuyu.tmall.com',
+    categories: [
+      { name: '全部家具', nameEn: 'All Furniture', url: 'https://yuanshimuyu.tmall.com/category.htm', icon: LayoutGrid },
+      { name: '沙发', nameEn: 'Sofas', url: 'https://s.taobao.com/search?q=源氏木语 沙发', icon: Sofa },
+      { name: '床', nameEn: 'Beds', url: 'https://s.taobao.com/search?q=源氏木语 床', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://s.taobao.com/search?q=源氏木语 椅子', icon: Armchair },
+      { name: '桌子', nameEn: 'Tables', url: 'https://s.taobao.com/search?q=源氏木语 书桌', icon: Frame },
+      { name: '收纳', nameEn: 'Storage', url: 'https://s.taobao.com/search?q=源氏木语 收纳', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'linshimuye',
+    name: '林氏家居',
+    nameZh: '林氏家居',
+    logo: '',
+    color: 'from-emerald-600 to-emerald-800',
+    bgColor: 'bg-emerald-50',
+    textColor: 'text-emerald-700',
+    description: '年轻人的家具品牌',
+    descriptionEn: 'Furniture brand for young people',
+    baseUrl: 'https://linshimuye.tmall.com',
+    categories: [
+      { name: '全部家具', nameEn: 'All Furniture', url: 'https://linshimuye.tmall.com/category.htm', icon: LayoutGrid },
+      { name: '沙发', nameEn: 'Sofas', url: 'https://s.taobao.com/search?q=林氏家居 沙发', icon: Sofa },
+      { name: '床', nameEn: 'Beds', url: 'https://s.taobao.com/search?q=林氏家居 床', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://s.taobao.com/search?q=林氏家居 椅子', icon: Armchair },
+      { name: '桌子', nameEn: 'Tables', url: 'https://s.taobao.com/search?q=林氏家居 书桌', icon: Frame },
+      { name: '灯具', nameEn: 'Lighting', url: 'https://s.taobao.com/search?q=林氏家居 灯', icon: Lamp },
+      { name: '收纳', nameEn: 'Storage', url: 'https://s.taobao.com/search?q=林氏家居 收纳', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'quanyou',
+    name: '全友家居',
+    nameZh: '全友家居',
+    logo: '',
+    color: 'from-green-600 to-green-800',
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-700',
+    description: '中国知名家居品牌',
+    descriptionEn: 'Famous Chinese furniture brand',
+    baseUrl: 'https://quanyou.tmall.com',
+    categories: [
+      { name: '全部家具', nameEn: 'All Furniture', url: 'https://quanyou.tmall.com/category.htm', icon: LayoutGrid },
+      { name: '沙发', nameEn: 'Sofas', url: 'https://s.taobao.com/search?q=全友家居 沙发', icon: Sofa },
+      { name: '床', nameEn: 'Beds', url: 'https://s.taobao.com/search?q=全友家居 床', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://s.taobao.com/search?q=全友家居 椅子', icon: Armchair },
+      { name: '桌子', nameEn: 'Tables', url: 'https://s.taobao.com/search?q=全友家居 餐桌', icon: Frame },
+      { name: '收纳', nameEn: 'Storage', url: 'https://s.taobao.com/search?q=全友家居 衣柜', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'xiaomi',
+    name: '小米有品',
+    nameZh: '小米有品',
+    logo: '',
+    color: 'from-orange-500 to-red-500',
+    bgColor: 'bg-orange-50',
+    textColor: 'text-orange-600',
+    description: '智能家居生态链',
+    descriptionEn: 'Smart home ecosystem',
+    baseUrl: 'https://www.xiaomiyoupin.com',
+    categories: [
+      { name: '全部家居', nameEn: 'All Home', url: 'https://www.xiaomiyoupin.com/category?cid=21', icon: LayoutGrid },
+      { name: '智能家居', nameEn: 'Smart Home', url: 'https://www.xiaomiyoupin.com/category?cid=2', icon: Lamp },
+      { name: '家具', nameEn: 'Furniture', url: 'https://search.jd.com/Search?keyword=小米有品 家具&enc=utf-8', icon: Sofa },
+      { name: '灯具', nameEn: 'Lighting', url: 'https://search.jd.com/Search?keyword=米家 灯&enc=utf-8', icon: Lamp },
+      { name: '收纳', nameEn: 'Storage', url: 'https://search.jd.com/Search?keyword=小米有品 收纳&enc=utf-8', icon: LayoutGrid },
+    ]
+  },
 ]
 
-const brands = [
-  { id: 'all', name: '全部品牌', nameEn: 'All Brands' },
-  { id: 'ikea', name: 'IKEA', nameEn: 'IKEA' },
-  { id: 'muji', name: 'MUJI', nameEn: 'MUJI' },
-  { id: 'hay', name: 'HAY', nameEn: 'HAY' },
-  { id: 'yuanshimuyu', name: '源氏木语', nameEn: 'Yuanshi Wood' },
-  { id: 'muzhigongfang', name: '木智工坊', nameEn: 'Muzhi Studio' },
+// Canada platforms
+const canadaPlatforms = [
+  {
+    id: 'amazon-ca',
+    name: 'Amazon',
+    nameZh: '亚马逊加拿大',
+    logo: '',
+    color: 'from-yellow-500 to-orange-500',
+    bgColor: 'bg-yellow-50',
+    textColor: 'text-yellow-700',
+    description: 'Everything you need, delivered fast',
+    descriptionEn: 'Everything you need, delivered fast',
+    baseUrl: 'https://www.amazon.ca',
+    categories: [
+      { name: 'All Furniture', nameEn: 'All Furniture', url: 'https://www.amazon.ca/s?k=furniture', icon: LayoutGrid },
+      { name: 'Sofas', nameEn: 'Sofas', url: 'https://www.amazon.ca/s?k=sofa', icon: Sofa },
+      { name: 'Beds', nameEn: 'Beds', url: 'https://www.amazon.ca/s?k=bed+frame', icon: BedDouble },
+      { name: 'Chairs', nameEn: 'Chairs', url: 'https://www.amazon.ca/s?k=chair', icon: Armchair },
+      { name: 'Desks', nameEn: 'Desks', url: 'https://www.amazon.ca/s?k=desk', icon: Frame },
+      { name: 'Lighting', nameEn: 'Lighting', url: 'https://www.amazon.ca/s?k=floor+lamp', icon: Lamp },
+      { name: 'Storage', nameEn: 'Storage', url: 'https://www.amazon.ca/s?k=storage+shelf', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'ikea-ca',
+    name: 'IKEA',
+    nameZh: '宜家加拿大',
+    logo: '',
+    color: 'from-blue-500 to-yellow-500',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-600',
+    description: 'Swedish home furnishing, affordable design',
+    descriptionEn: 'Swedish home furnishing, affordable design',
+    baseUrl: 'https://www.ikea.com/ca/en/',
+    categories: [
+      { name: 'All Furniture', nameEn: 'All Furniture', url: 'https://www.ikea.com/ca/en/cat/furniture-fu001/', icon: LayoutGrid },
+      { name: 'Sofas', nameEn: 'Sofas', url: 'https://www.ikea.com/ca/en/cat/sofas-fu003/', icon: Sofa },
+      { name: 'Beds', nameEn: 'Beds', url: 'https://www.ikea.com/ca/en/cat/beds-bm003/', icon: BedDouble },
+      { name: 'Chairs', nameEn: 'Chairs', url: 'https://www.ikea.com/ca/en/cat/chairs-fu002/', icon: Armchair },
+      { name: 'Desks', nameEn: 'Desks', url: 'https://www.ikea.com/ca/en/cat/desks-20649/', icon: Frame },
+      { name: 'Lighting', nameEn: 'Lighting', url: 'https://www.ikea.com/ca/en/cat/lighting-li001/', icon: Lamp },
+      { name: 'Storage', nameEn: 'Storage', url: 'https://www.ikea.com/ca/en/cat/storage-furniture-st001/', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'wayfair',
+    name: 'Wayfair',
+    nameZh: 'Wayfair',
+    logo: '',
+    color: 'from-purple-500 to-purple-700',
+    bgColor: 'bg-purple-50',
+    textColor: 'text-purple-600',
+    description: 'A zillion things home',
+    descriptionEn: 'A zillion things home',
+    baseUrl: 'https://www.wayfair.ca',
+    categories: [
+      { name: 'All Furniture', nameEn: 'All Furniture', url: 'https://www.wayfair.ca/furniture/cat/furniture-c45974.html', icon: LayoutGrid },
+      { name: 'Sofas', nameEn: 'Sofas', url: 'https://www.wayfair.ca/furniture/sb0/sofas-c413892.html', icon: Sofa },
+      { name: 'Beds', nameEn: 'Beds', url: 'https://www.wayfair.ca/furniture/sb0/beds-c413978.html', icon: BedDouble },
+      { name: 'Chairs', nameEn: 'Chairs', url: 'https://www.wayfair.ca/furniture/sb0/accent-chairs-c413836.html', icon: Armchair },
+      { name: 'Desks', nameEn: 'Desks', url: 'https://www.wayfair.ca/furniture/sb0/desks-c45706.html', icon: Frame },
+      { name: 'Lighting', nameEn: 'Lighting', url: 'https://www.wayfair.ca/lighting/cat/lighting-c215329.html', icon: Lamp },
+      { name: 'Storage', nameEn: 'Storage', url: 'https://www.wayfair.ca/storage-organization/cat/storage-organization-c215875.html', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'structube',
+    name: 'Structube',
+    nameZh: 'Structube',
+    logo: '',
+    color: 'from-gray-700 to-gray-900',
+    bgColor: 'bg-gray-50',
+    textColor: 'text-gray-700',
+    description: 'Modern furniture at affordable prices',
+    descriptionEn: 'Modern furniture at affordable prices',
+    baseUrl: 'https://www.structube.com',
+    categories: [
+      { name: 'All Furniture', nameEn: 'All Furniture', url: 'https://www.structube.com/en_ca/furniture', icon: LayoutGrid },
+      { name: 'Sofas', nameEn: 'Sofas', url: 'https://www.structube.com/en_ca/living/sofas', icon: Sofa },
+      { name: 'Beds', nameEn: 'Beds', url: 'https://www.structube.com/en_ca/bedroom/beds', icon: BedDouble },
+      { name: 'Chairs', nameEn: 'Chairs', url: 'https://www.structube.com/en_ca/living/chairs', icon: Armchair },
+      { name: 'Desks', nameEn: 'Desks', url: 'https://www.structube.com/en_ca/office/desks', icon: Frame },
+      { name: 'Lighting', nameEn: 'Lighting', url: 'https://www.structube.com/en_ca/decor/lighting', icon: Lamp },
+      { name: 'Storage', nameEn: 'Storage', url: 'https://www.structube.com/en_ca/living/storage', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'cb2',
+    name: 'CB2',
+    nameZh: 'CB2',
+    logo: '',
+    color: 'from-black to-gray-800',
+    bgColor: 'bg-gray-100',
+    textColor: 'text-gray-800',
+    description: 'Modern furniture and home decor',
+    descriptionEn: 'Modern furniture and home decor',
+    baseUrl: 'https://www.cb2.ca',
+    categories: [
+      { name: 'All Furniture', nameEn: 'All Furniture', url: 'https://www.cb2.ca/furniture/', icon: LayoutGrid },
+      { name: 'Sofas', nameEn: 'Sofas', url: 'https://www.cb2.ca/furniture/sofas/', icon: Sofa },
+      { name: 'Beds', nameEn: 'Beds', url: 'https://www.cb2.ca/furniture/bedroom/beds/', icon: BedDouble },
+      { name: 'Chairs', nameEn: 'Chairs', url: 'https://www.cb2.ca/furniture/chairs/', icon: Armchair },
+      { name: 'Desks', nameEn: 'Desks', url: 'https://www.cb2.ca/furniture/office/desks/', icon: Frame },
+      { name: 'Lighting', nameEn: 'Lighting', url: 'https://www.cb2.ca/lighting/', icon: Lamp },
+      { name: 'Storage', nameEn: 'Storage', url: 'https://www.cb2.ca/furniture/storage/', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'westelm',
+    name: 'West Elm',
+    nameZh: 'West Elm',
+    logo: '',
+    color: 'from-amber-600 to-amber-800',
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
+    description: 'Modern furniture and home accessories',
+    descriptionEn: 'Modern furniture and home accessories',
+    baseUrl: 'https://www.westelm.ca',
+    categories: [
+      { name: 'All Furniture', nameEn: 'All Furniture', url: 'https://www.westelm.ca/furniture/', icon: LayoutGrid },
+      { name: 'Sofas', nameEn: 'Sofas', url: 'https://www.westelm.ca/sofas-sectionals/', icon: Sofa },
+      { name: 'Beds', nameEn: 'Beds', url: 'https://www.westelm.ca/beds/', icon: BedDouble },
+      { name: 'Chairs', nameEn: 'Chairs', url: 'https://www.westelm.ca/chairs/', icon: Armchair },
+      { name: 'Desks', nameEn: 'Desks', url: 'https://www.westelm.ca/desks/', icon: Frame },
+      { name: 'Lighting', nameEn: 'Lighting', url: 'https://www.westelm.ca/lighting/', icon: Lamp },
+      { name: 'Storage', nameEn: 'Storage', url: 'https://www.westelm.ca/storage/', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'eq3',
+    name: 'EQ3',
+    nameZh: 'EQ3',
+    logo: '',
+    color: 'from-teal-600 to-teal-800',
+    bgColor: 'bg-teal-50',
+    textColor: 'text-teal-700',
+    description: 'Canadian modern furniture',
+    descriptionEn: 'Canadian modern furniture',
+    baseUrl: 'https://www.eq3.com',
+    categories: [
+      { name: 'All Furniture', nameEn: 'All Furniture', url: 'https://www.eq3.com/ca/en/shop/furniture', icon: LayoutGrid },
+      { name: 'Sofas', nameEn: 'Sofas', url: 'https://www.eq3.com/ca/en/shop/furniture/living/sofas', icon: Sofa },
+      { name: 'Beds', nameEn: 'Beds', url: 'https://www.eq3.com/ca/en/shop/furniture/bedroom/beds', icon: BedDouble },
+      { name: 'Chairs', nameEn: 'Chairs', url: 'https://www.eq3.com/ca/en/shop/furniture/living/chairs', icon: Armchair },
+      { name: 'Desks', nameEn: 'Desks', url: 'https://www.eq3.com/ca/en/shop/furniture/office/desks', icon: Frame },
+      { name: 'Lighting', nameEn: 'Lighting', url: 'https://www.eq3.com/ca/en/shop/lighting', icon: Lamp },
+      { name: 'Storage', nameEn: 'Storage', url: 'https://www.eq3.com/ca/en/shop/furniture/storage', icon: LayoutGrid },
+    ]
+  },
+  {
+    id: 'homesense',
+    name: 'HomeSense',
+    nameZh: 'HomeSense',
+    logo: '',
+    color: 'from-red-500 to-red-700',
+    bgColor: 'bg-red-50',
+    textColor: 'text-red-600',
+    description: 'Unique home finds at great prices',
+    descriptionEn: 'Unique home finds at great prices',
+    baseUrl: 'https://www.homesense.ca',
+    categories: [
+      { name: 'Store Locator', nameEn: 'Store Locator', url: 'https://www.homesense.ca/en/stores', icon: LayoutGrid },
+      { name: 'Furniture', nameEn: 'Furniture', url: 'https://www.amazon.ca/s?k=homesense+furniture', icon: Sofa },
+      { name: 'Home Decor', nameEn: 'Home Decor', url: 'https://www.amazon.ca/s?k=home+decor', icon: Frame },
+      { name: 'Lighting', nameEn: 'Lighting', url: 'https://www.amazon.ca/s?k=home+lighting', icon: Lamp },
+    ]
+  },
 ]
 
-// Mock furniture data
-const mockFurniture = [
+// Japan platforms
+const japanPlatforms = [
   {
-    id: 'f1',
-    name: '北欧布艺三人沙发',
-    category: 'sofa',
-    price: 3200,
-    originalPrice: 3999,
-    image: null,
-    brand: 'IKEA',
-    style: ['nordic', 'modern'],
-    colors: ['#E8DED1', '#6B8E6B', '#D4A574'],
-    rating: 4.5,
-    reviews: 1234,
-    dimensions: '220×85×80cm',
-    inStock: true,
+    id: 'amazon-jp',
+    name: 'Amazon',
+    nameZh: '亚马逊日本',
+    logo: '',
+    color: 'from-yellow-500 to-orange-500',
+    bgColor: 'bg-yellow-50',
+    textColor: 'text-yellow-700',
+    description: '豊富な品揃え、迅速配送',
+    descriptionEn: 'Vast selection, fast delivery',
+    baseUrl: 'https://www.amazon.co.jp',
+    categories: [
+      { name: '家具', nameEn: 'All Furniture', url: 'https://www.amazon.co.jp/s?k=家具', icon: LayoutGrid },
+      { name: 'ソファ', nameEn: 'Sofas', url: 'https://www.amazon.co.jp/s?k=ソファ', icon: Sofa },
+      { name: 'ベッド', nameEn: 'Beds', url: 'https://www.amazon.co.jp/s?k=ベッド', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://www.amazon.co.jp/s?k=椅子', icon: Armchair },
+      { name: 'デスク', nameEn: 'Desks', url: 'https://www.amazon.co.jp/s?k=デスク', icon: Frame },
+      { name: '照明', nameEn: 'Lighting', url: 'https://www.amazon.co.jp/s?k=照明', icon: Lamp },
+      { name: '収納', nameEn: 'Storage', url: 'https://www.amazon.co.jp/s?k=収納', icon: LayoutGrid },
+    ]
   },
   {
-    id: 'f2',
-    name: '日式棉麻沙发',
-    category: 'sofa',
-    price: 2800,
-    originalPrice: null,
-    image: null,
-    brand: 'MUJI',
-    style: ['japanese', 'nordic'],
-    colors: ['#F5F1EB', '#C9B896', '#3D3D3D'],
-    rating: 4.7,
-    reviews: 856,
-    dimensions: '200×90×35cm',
-    inStock: true,
+    id: 'rakuten',
+    name: '楽天市場',
+    nameZh: '乐天市场',
+    logo: '',
+    color: 'from-red-600 to-red-700',
+    bgColor: 'bg-red-50',
+    textColor: 'text-red-600',
+    description: '日本最大級のショッピングモール',
+    descriptionEn: 'Japan largest shopping mall',
+    baseUrl: 'https://www.rakuten.co.jp',
+    categories: [
+      { name: '家具', nameEn: 'All Furniture', url: 'https://search.rakuten.co.jp/search/mall/家具/', icon: LayoutGrid },
+      { name: 'ソファ', nameEn: 'Sofas', url: 'https://search.rakuten.co.jp/search/mall/ソファ/', icon: Sofa },
+      { name: 'ベッド', nameEn: 'Beds', url: 'https://search.rakuten.co.jp/search/mall/ベッド/', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://search.rakuten.co.jp/search/mall/椅子/', icon: Armchair },
+      { name: 'デスク', nameEn: 'Desks', url: 'https://search.rakuten.co.jp/search/mall/デスク/', icon: Frame },
+      { name: '照明', nameEn: 'Lighting', url: 'https://search.rakuten.co.jp/search/mall/照明/', icon: Lamp },
+      { name: '収納', nameEn: 'Storage', url: 'https://search.rakuten.co.jp/search/mall/収納/', icon: LayoutGrid },
+    ]
   },
   {
-    id: 'f3',
-    name: '原木茶几',
-    category: 'table',
-    price: 1200,
-    originalPrice: 1500,
-    image: null,
-    brand: '源氏木语',
-    style: ['nordic', 'japanese'],
-    colors: ['#D4A574', '#8B7355', '#F5F5DC'],
-    rating: 4.8,
-    reviews: 2341,
-    dimensions: '120×60×45cm',
-    inStock: true,
+    id: 'muji-jp',
+    name: '無印良品',
+    nameZh: '无印良品',
+    logo: '',
+    color: 'from-warmgray-600 to-warmgray-800',
+    bgColor: 'bg-warmgray-50',
+    textColor: 'text-warmgray-700',
+    description: 'シンプルで質の良い生活',
+    descriptionEn: 'Simple, quality life',
+    baseUrl: 'https://www.muji.com/jp/',
+    categories: [
+      { name: '家具', nameEn: 'All Furniture', url: 'https://www.muji.com/jp/ja/store/cmdty/section/S1070101', icon: LayoutGrid },
+      { name: 'ソファ', nameEn: 'Sofas', url: 'https://www.muji.com/jp/ja/store/cmdty/section/S107010201', icon: Sofa },
+      { name: 'ベッド', nameEn: 'Beds', url: 'https://www.muji.com/jp/ja/store/cmdty/section/S107010101', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://www.muji.com/jp/ja/store/cmdty/section/S107010301', icon: Armchair },
+      { name: 'デスク', nameEn: 'Desks', url: 'https://www.muji.com/jp/ja/store/cmdty/section/S107010401', icon: Frame },
+      { name: '照明', nameEn: 'Lighting', url: 'https://www.muji.com/jp/ja/store/cmdty/section/S10702', icon: Lamp },
+      { name: '収納', nameEn: 'Storage', url: 'https://www.muji.com/jp/ja/store/cmdty/section/S10703', icon: LayoutGrid },
+    ]
   },
   {
-    id: 'f4',
-    name: '大理石茶几',
-    category: 'table',
-    price: 2400,
-    originalPrice: null,
-    image: null,
-    brand: 'HAY',
-    style: ['modern'],
-    colors: ['#FFFFFF', '#C4C4C4', '#1A1A1A'],
-    rating: 4.6,
-    reviews: 567,
-    dimensions: '100×50×40cm',
-    inStock: true,
+    id: 'ikea-jp',
+    name: 'IKEA',
+    nameZh: '宜家日本',
+    logo: '',
+    color: 'from-blue-500 to-yellow-500',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-600',
+    description: 'スウェーデン発の家具ブランド',
+    descriptionEn: 'Swedish home furnishing',
+    baseUrl: 'https://www.ikea.com/jp/ja/',
+    categories: [
+      { name: '家具', nameEn: 'All Furniture', url: 'https://www.ikea.com/jp/ja/cat/furniture-fu001/', icon: LayoutGrid },
+      { name: 'ソファ', nameEn: 'Sofas', url: 'https://www.ikea.com/jp/ja/cat/sofas-fu003/', icon: Sofa },
+      { name: 'ベッド', nameEn: 'Beds', url: 'https://www.ikea.com/jp/ja/cat/beds-bm003/', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://www.ikea.com/jp/ja/cat/chairs-fu002/', icon: Armchair },
+      { name: 'デスク', nameEn: 'Desks', url: 'https://www.ikea.com/jp/ja/cat/desks-20649/', icon: Frame },
+      { name: '照明', nameEn: 'Lighting', url: 'https://www.ikea.com/jp/ja/cat/lighting-li001/', icon: Lamp },
+      { name: '収納', nameEn: 'Storage', url: 'https://www.ikea.com/jp/ja/cat/storage-furniture-st001/', icon: LayoutGrid },
+    ]
   },
   {
-    id: 'f5',
-    name: '北欧落地灯',
-    category: 'lighting',
-    price: 680,
-    originalPrice: 899,
-    image: null,
-    brand: 'MUJI',
-    style: ['nordic', 'modern', 'japanese'],
-    colors: ['#FEFEFE', '#E8DED1', '#3D3D3D'],
-    rating: 4.4,
-    reviews: 789,
-    dimensions: 'H160cm',
-    inStock: true,
+    id: 'nitori',
+    name: 'ニトリ',
+    nameZh: '尼达利',
+    logo: '',
+    color: 'from-green-600 to-green-700',
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-600',
+    description: 'お、ねだん以上。ニトリ',
+    descriptionEn: 'Quality furniture at great prices',
+    baseUrl: 'https://www.nitori-net.jp',
+    categories: [
+      { name: '家具', nameEn: 'All Furniture', url: 'https://www.nitori-net.jp/ec/cat/Furniture/', icon: LayoutGrid },
+      { name: 'ソファ', nameEn: 'Sofas', url: 'https://www.nitori-net.jp/ec/cat/Sofa/', icon: Sofa },
+      { name: 'ベッド', nameEn: 'Beds', url: 'https://www.nitori-net.jp/ec/cat/Bed/', icon: BedDouble },
+      { name: '椅子', nameEn: 'Chairs', url: 'https://www.nitori-net.jp/ec/cat/Chair/', icon: Armchair },
+      { name: 'デスク', nameEn: 'Desks', url: 'https://www.nitori-net.jp/ec/cat/Desk/', icon: Frame },
+      { name: '照明', nameEn: 'Lighting', url: 'https://www.nitori-net.jp/ec/cat/Light/', icon: Lamp },
+      { name: '収納', nameEn: 'Storage', url: 'https://www.nitori-net.jp/ec/cat/Storage/', icon: LayoutGrid },
+    ]
   },
   {
-    id: 'f6',
-    name: '日式纸灯笼吊灯',
-    category: 'lighting',
-    price: 520,
-    originalPrice: null,
-    image: null,
-    brand: 'Noguchi',
-    style: ['japanese'],
-    colors: ['#FFFAF0', '#F5F1EB', '#C9B896'],
-    rating: 4.9,
-    reviews: 423,
-    dimensions: 'D45cm',
-    inStock: false,
+    id: 'francfranc',
+    name: 'Francfranc',
+    nameZh: 'Francfranc',
+    logo: '',
+    color: 'from-pink-500 to-pink-600',
+    bgColor: 'bg-pink-50',
+    textColor: 'text-pink-600',
+    description: 'デザイン性の高いインテリア',
+    descriptionEn: 'Stylish interior design',
+    baseUrl: 'https://francfranc.com',
+    categories: [
+      { name: '家具', nameEn: 'All Furniture', url: 'https://francfranc.com/collections/furniture', icon: LayoutGrid },
+      { name: 'ソファ', nameEn: 'Sofas', url: 'https://francfranc.com/collections/sofa', icon: Sofa },
+      { name: 'チェア', nameEn: 'Chairs', url: 'https://francfranc.com/collections/chair', icon: Armchair },
+      { name: 'テーブル', nameEn: 'Tables', url: 'https://francfranc.com/collections/table', icon: Frame },
+      { name: '照明', nameEn: 'Lighting', url: 'https://francfranc.com/collections/lighting', icon: Lamp },
+      { name: '収納', nameEn: 'Storage', url: 'https://francfranc.com/collections/storage', icon: LayoutGrid },
+    ]
   },
   {
-    id: 'f7',
-    name: '羊毛编织地毯',
-    category: 'rug',
-    price: 1500,
-    originalPrice: 1800,
-    image: null,
-    brand: 'MUJI',
-    style: ['nordic', 'japanese'],
-    colors: ['#E8DED1', '#C9B896', '#8B9A6B'],
-    rating: 4.7,
-    reviews: 654,
-    dimensions: '200×140cm',
-    inStock: true,
+    id: 'actus',
+    name: 'ACTUS',
+    nameZh: 'ACTUS',
+    logo: '',
+    color: 'from-amber-700 to-amber-800',
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
+    description: '上質なライフスタイルを提案',
+    descriptionEn: 'Premium lifestyle furniture',
+    baseUrl: 'https://online.actus-interior.com',
+    categories: [
+      { name: '家具', nameEn: 'All Furniture', url: 'https://online.actus-interior.com/furniture/', icon: LayoutGrid },
+      { name: 'ソファ', nameEn: 'Sofas', url: 'https://online.actus-interior.com/furniture/sofa/', icon: Sofa },
+      { name: 'ベッド', nameEn: 'Beds', url: 'https://online.actus-interior.com/furniture/bed/', icon: BedDouble },
+      { name: 'チェア', nameEn: 'Chairs', url: 'https://online.actus-interior.com/furniture/chair/', icon: Armchair },
+      { name: 'テーブル', nameEn: 'Tables', url: 'https://online.actus-interior.com/furniture/table/', icon: Frame },
+      { name: '照明', nameEn: 'Lighting', url: 'https://online.actus-interior.com/lighting/', icon: Lamp },
+    ]
   },
   {
-    id: 'f8',
-    name: '开放式书架',
-    category: 'storage',
-    price: 1800,
-    originalPrice: null,
-    image: null,
-    brand: 'IKEA',
-    style: ['nordic', 'modern', 'industrial'],
-    colors: ['#FEFEFE', '#1A1A1A', '#8B7355'],
-    rating: 4.5,
-    reviews: 1567,
-    dimensions: '180×80×30cm',
-    inStock: true,
-  },
-  {
-    id: 'f9',
-    name: '北欧风装饰画',
-    category: 'decor',
-    price: 420,
-    originalPrice: 520,
-    image: null,
-    brand: '艺术家原创',
-    style: ['nordic', 'modern'],
-    colors: ['#87CEEB', '#F5DEB3', '#2F4F4F'],
-    rating: 4.6,
-    reviews: 234,
-    dimensions: '80×60cm',
-    inStock: true,
-  },
-  {
-    id: 'f10',
-    name: '仿真绿植盆栽',
-    category: 'decor',
-    price: 180,
-    originalPrice: null,
-    image: null,
-    brand: 'IKEA',
-    style: ['nordic', 'modern', 'japanese', 'industrial'],
-    colors: ['#228B22', '#6B8E6B', '#8B9A6B'],
-    rating: 4.3,
-    reviews: 3456,
-    dimensions: 'H120cm',
-    inStock: true,
-  },
-  {
-    id: 'f11',
-    name: '工业风铁艺茶几',
-    category: 'table',
-    price: 1800,
-    originalPrice: 2200,
-    image: null,
-    brand: '工业记忆',
-    style: ['industrial'],
-    colors: ['#4A4A4A', '#8B4513', '#2F2F2F'],
-    rating: 4.5,
-    reviews: 432,
-    dimensions: '130×70×45cm',
-    inStock: true,
-  },
-  {
-    id: 'f12',
-    name: '复古皮质沙发',
-    category: 'sofa',
-    price: 4500,
-    originalPrice: 5500,
-    image: null,
-    brand: 'HAY',
-    style: ['industrial', 'midcentury'],
-    colors: ['#8B4513', '#4A4A4A', '#D2691E'],
-    rating: 4.8,
-    reviews: 321,
-    dimensions: '240×95×85cm',
-    inStock: true,
+    id: 'unico',
+    name: 'unico',
+    nameZh: 'unico',
+    logo: '',
+    color: 'from-teal-600 to-teal-700',
+    bgColor: 'bg-teal-50',
+    textColor: 'text-teal-600',
+    description: 'ナチュラルヴィンテージ',
+    descriptionEn: 'Natural vintage style',
+    baseUrl: 'https://www.unico-fan.co.jp',
+    categories: [
+      { name: '家具', nameEn: 'All Furniture', url: 'https://www.unico-fan.co.jp/category/FURNITURE/', icon: LayoutGrid },
+      { name: 'ソファ', nameEn: 'Sofas', url: 'https://www.unico-fan.co.jp/category/SOFA/', icon: Sofa },
+      { name: 'ベッド', nameEn: 'Beds', url: 'https://www.unico-fan.co.jp/category/BED/', icon: BedDouble },
+      { name: 'チェア', nameEn: 'Chairs', url: 'https://www.unico-fan.co.jp/category/CHAIR/', icon: Armchair },
+      { name: 'テーブル', nameEn: 'Tables', url: 'https://www.unico-fan.co.jp/category/TABLE/', icon: Frame },
+      { name: '照明', nameEn: 'Lighting', url: 'https://www.unico-fan.co.jp/category/LIGHT/', icon: Lamp },
+    ]
   },
 ]
 
 export default function FurniturePage() {
   const { language } = useLanguage()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedStyle, setSelectedStyle] = useState('all')
-  const [selectedBrand, setSelectedBrand] = useState('all')
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000])
-  const [sortBy, setSortBy] = useState('popular')
-  const [showFilters, setShowFilters] = useState(false)
-  const [favorites, setFavorites] = useState<string[]>([])
+  const [selectedRegion, setSelectedRegion] = useState<'cn' | 'ca' | 'jp'>('cn')
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
+  const [iframeUrl, setIframeUrl] = useState<string | null>(null)
+
+  // Get platforms based on selected region
+  const platforms = selectedRegion === 'cn' 
+    ? chinaPlatforms 
+    : selectedRegion === 'ca' 
+      ? canadaPlatforms 
+      : japanPlatforms
 
   const texts = {
     zh: {
       title: '家具商城',
-      subtitle: '精选高品质家具，让设计方案变为现实',
-      search: '搜索家具名称、品牌...',
-      filter: '筛选',
-      style: '风格',
-      brand: '品牌',
-      priceRange: '价格范围',
-      found: '找到',
-      items: '件商品',
-      outOfStock: '缺货',
-      addToList: '加入清单',
-      dimensions: '尺寸',
-      noResults: '没有找到匹配的商品',
-      tryAdjust: '尝试调整筛选条件或搜索关键词',
-      clearFilter: '清除筛选',
-      popular: '最受欢迎',
-      priceLow: '价格从低到高',
-      priceHigh: '价格从高到低',
-      topRated: '评分最高',
-      mostReviews: '评论最多',
+      subtitle: '一站式浏览各大电商平台家具，比价选购更方便',
+      selectRegion: '选择地区',
+      selectPlatform: '选择购物平台',
+      selectCategory: '选择分类',
+      openInNewTab: '在新标签页打开',
+      backToPlatforms: '返回平台列表',
+      viewOnPlatform: '在平台查看',
+      tip: '点击分类直接跳转到对应平台商品页面',
+      tipEmbedded: '提示：部分平台可能需要登录才能查看完整内容',
     },
     en: {
       title: 'Furniture Store',
-      subtitle: 'Quality furniture to bring your designs to life',
-      search: 'Search furniture, brands...',
-      filter: 'Filter',
-      style: 'Style',
-      brand: 'Brand',
-      priceRange: 'Price Range',
-      found: 'Found',
-      items: 'items',
-      outOfStock: 'Out of Stock',
-      addToList: 'Add to List',
-      dimensions: 'Size',
-      noResults: 'No matching products found',
-      tryAdjust: 'Try adjusting filters or search keywords',
-      clearFilter: 'Clear Filters',
-      popular: 'Most Popular',
-      priceLow: 'Price: Low to High',
-      priceHigh: 'Price: High to Low',
-      topRated: 'Top Rated',
-      mostReviews: 'Most Reviews',
+      subtitle: 'Browse furniture from major e-commerce platforms in one place',
+      selectRegion: 'Select Region',
+      selectPlatform: 'Select Platform',
+      selectCategory: 'Select Category',
+      openInNewTab: 'Open in New Tab',
+      backToPlatforms: 'Back to Platforms',
+      viewOnPlatform: 'View on Platform',
+      tip: 'Click category to go directly to platform product page',
+      tipEmbedded: 'Tip: Some platforms may require login to view full content',
     }
   }
   const txt = texts[language]
 
-  const filteredFurniture = mockFurniture.filter(item => {
-    const matchesSearch = !searchQuery || 
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.brand.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
-    const matchesStyle = selectedStyle === 'all' || item.style.includes(selectedStyle)
-    const matchesBrand = selectedBrand === 'all' || item.brand.toLowerCase().includes(selectedBrand)
-    const matchesPrice = item.price >= priceRange[0] && item.price <= priceRange[1]
-    
-    return matchesSearch && matchesCategory && matchesStyle && matchesBrand && matchesPrice
-  })
+  const selectedPlatformData = platforms.find(p => p.id === selectedPlatform)
 
-  // Sort
-  const sortedFurniture = [...filteredFurniture].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.price - b.price
-      case 'price-high':
-        return b.price - a.price
-      case 'rating':
-        return b.rating - a.rating
-      case 'reviews':
-        return b.reviews - a.reviews
-      default:
-        return b.reviews - a.reviews // popular
-    }
-  })
-
-  const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
-    )
+  const handleCategoryClick = (url: string) => {
+    // Open in new tab for better user experience
+    window.open(url, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -333,7 +587,7 @@ export default function FurniturePage() {
       <main className="flex-1 pt-28 pb-16">
         <div className="container mx-auto px-6">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-12">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -345,251 +599,200 @@ export default function FurniturePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-lg text-warmgray-600"
+              className="text-lg text-warmgray-600 max-w-2xl mx-auto"
             >
               {txt.subtitle}
             </motion.p>
           </div>
 
-          {/* Search and Filter Bar */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 mb-8">
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Search */}
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-warmgray-400" />
-                <input
-                  type="text"
-                  placeholder={txt.search}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input-primary pl-12"
-                />
-              </div>
-
-              {/* Filter toggles */}
-              <div className="flex gap-2">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="input-primary pr-10 appearance-none bg-no-repeat bg-right"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundSize: '1.5rem' }}
-                >
-                  <option value="popular">{txt.popular}</option>
-                  <option value="price-low">{txt.priceLow}</option>
-                  <option value="price-high">{txt.priceHigh}</option>
-                  <option value="rating">{txt.topRated}</option>
-                  <option value="reviews">{txt.mostReviews}</option>
-                </select>
-
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`btn-secondary flex items-center gap-2 ${showFilters ? 'bg-terracotta-50 text-terracotta-600' : ''}`}
-                >
-                  <SlidersHorizontal className="w-5 h-5" />
-                  {txt.filter}
-                </button>
-              </div>
-            </div>
-
-            {/* Extended Filters */}
-            {showFilters && (
+          {!selectedPlatform ? (
+            <>
+              {/* Region Selector */}
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-4 pt-4 border-t border-warmgray-100"
-              >
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-warmgray-700 mb-2">{txt.style}</label>
-                    <select
-                      value={selectedStyle}
-                      onChange={(e) => setSelectedStyle(e.target.value)}
-                      className="input-primary"
-                    >
-                      {styles.map(style => (
-                        <option key={style.id} value={style.id}>{language === 'zh' ? style.name : style.nameEn}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-warmgray-700 mb-2">{txt.brand}</label>
-                    <select
-                      value={selectedBrand}
-                      onChange={(e) => setSelectedBrand(e.target.value)}
-                      className="input-primary"
-                    >
-                      {brands.map(brand => (
-                        <option key={brand.id} value={brand.id}>{language === 'zh' ? brand.name : brand.nameEn}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-warmgray-700 mb-2">
-                      {txt.priceRange}: {formatCurrency(priceRange[0])} - {formatCurrency(priceRange[1])}
-                    </label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="10000"
-                      step="500"
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full h-2 bg-warmgray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </div>
-
-          {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
-            {categories.map(category => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${
-                  selectedCategory === category.id
-                    ? 'bg-terracotta-500 text-white'
-                    : 'bg-white text-warmgray-600 hover:bg-warmgray-100'
-                }`}
-              >
-                <span>{language === 'zh' ? category.name : category.nameEn}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Results count */}
-          <div className="text-warmgray-500 mb-6">
-            {txt.found} {sortedFurniture.length} {txt.items}
-          </div>
-
-          {/* Product Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sortedFurniture.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.03 }}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-elevated transition-all duration-300"
+                className="flex justify-center mb-10"
               >
-                {/* Image */}
-                <div className="aspect-square relative overflow-hidden">
-                  <div 
-                    className="absolute inset-0"
-                    style={{
-                      background: `linear-gradient(135deg, ${item.colors[0]} 0%, ${item.colors[1]} 50%, ${item.colors[2]} 100%)`,
-                    }}
-                  />
-                  
-                  {/* Badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-2">
-                    {item.originalPrice && (
-                      <span className="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded-full">
-                        -{Math.round((1 - item.price / item.originalPrice) * 100)}%
-                      </span>
-                    )}
-                    {!item.inStock && (
-                      <span className="px-2 py-1 bg-warmgray-500 text-white text-xs font-medium rounded-full">
-                        {txt.outOfStock}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Favorite button */}
-                  <button
-                    onClick={() => toggleFavorite(item.id)}
-                    className="absolute top-3 right-3 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-                  >
-                    <Heart 
-                      className={`w-5 h-5 ${
-                        favorites.includes(item.id) 
-                          ? 'fill-red-500 text-red-500' 
-                          : 'text-warmgray-500'
-                      }`} 
-                    />
-                  </button>
-
-                  {/* Quick actions */}
-                  <div className="absolute bottom-3 left-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="flex-1 py-2 bg-terracotta-500 text-white text-sm font-medium rounded-lg hover:bg-terracotta-600 transition-colors flex items-center justify-center gap-1">
-                      <ShoppingCart className="w-4 h-4" />
-                      {txt.addToList}
-                    </button>
-                    <a
-                      href="#"
-                      target="_blank"
-                      className="py-2 px-3 bg-white text-warmgray-700 text-sm font-medium rounded-lg hover:bg-warmgray-100 transition-colors"
+                <div className="inline-flex bg-white rounded-2xl p-2 shadow-sm border border-warmgray-100">
+                  {regions.map((region) => (
+                    <button
+                      key={region.id}
+                      onClick={() => {
+                        setSelectedRegion(region.id as 'cn' | 'ca' | 'jp')
+                        setSelectedPlatform(null)
+                      }}
+                      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                        selectedRegion === region.id
+                          ? 'bg-terracotta-500 text-white shadow-md'
+                          : 'text-warmgray-600 hover:bg-warmgray-50'
+                      }`}
                     >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                  <div className="text-xs text-warmgray-500 mb-1">{item.brand}</div>
-                  <h3 className="font-semibold text-warmgray-900 mb-2 line-clamp-2 group-hover:text-terracotta-600 transition-colors">
-                    {item.name}
-                  </h3>
-                  
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{item.rating}</span>
-                    </div>
-                    <span className="text-sm text-warmgray-400">({item.reviews})</span>
-                  </div>
-                  
-                  {/* Price */}
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xl font-bold text-terracotta-600">
-                      {formatCurrency(item.price)}
-                    </span>
-                    {item.originalPrice && (
-                      <span className="text-sm text-warmgray-400 line-through">
-                        {formatCurrency(item.originalPrice)}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Dimensions */}
-                  <div className="text-xs text-warmgray-500 mt-2">
-                    {txt.dimensions}: {item.dimensions}
-                  </div>
+                      <span className="text-xl">{region.flag}</span>
+                      <span>{language === 'zh' ? region.name : region.nameEn}</span>
+                    </button>
+                  ))}
                 </div>
               </motion.div>
-            ))}
-          </div>
 
-          {/* Empty state */}
-          {sortedFurniture.length === 0 && (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 mx-auto bg-warmgray-100 rounded-full flex items-center justify-center mb-4">
-                <Search className="w-8 h-8 text-warmgray-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-warmgray-700 mb-2">
-                {txt.noResults}
-              </h3>
-              <p className="text-warmgray-500 mb-4">
-                {txt.tryAdjust}
-              </p>
-              <button
-                onClick={() => {
-                  setSearchQuery('')
-                  setSelectedCategory('all')
-                  setSelectedStyle('all')
-                  setSelectedBrand('all')
-                  setPriceRange([0, 10000])
-                }}
-                className="btn-secondary"
+              {/* Platform Selection */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="mb-8"
               >
-                {txt.clearFilter}
-              </button>
-            </div>
+                <h2 className="text-xl font-semibold text-warmgray-800 mb-6 flex items-center gap-2">
+                  <Store className="w-5 h-5" />
+                  {txt.selectPlatform}
+                  <span className="text-sm font-normal text-warmgray-500 ml-2">
+                    ({selectedRegion === 'cn' 
+                      ? (language === 'zh' ? '中国平台' : 'China') 
+                      : selectedRegion === 'ca' 
+                        ? (language === 'zh' ? '加拿大平台' : 'Canada')
+                        : (language === 'zh' ? '日本平台' : 'Japan')})
+                  </span>
+                </h2>
+                
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {platforms.map((platform, index) => (
+                    <motion.button
+                      key={platform.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      onClick={() => setSelectedPlatform(platform.id)}
+                      className={`${platform.bgColor} rounded-2xl p-6 text-left hover:shadow-lg transition-all duration-300 group border border-transparent hover:border-warmgray-200`}
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center text-white font-bold text-lg shadow-md`}>
+                          {platform.name.charAt(0)}
+                        </div>
+                        <ChevronRight className={`w-5 h-5 ${platform.textColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                      </div>
+                      
+                      <h3 className={`text-xl font-bold ${platform.textColor} mb-1`}>
+                        {platform.name}
+                      </h3>
+                      <p className="text-sm text-warmgray-500 mb-3">
+                        {language === 'zh' ? platform.nameZh : platform.name}
+                      </p>
+                      <p className="text-sm text-warmgray-600">
+                        {language === 'zh' ? platform.description : platform.descriptionEn}
+                      </p>
+                      
+                      {/* Category preview */}
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {platform.categories.slice(0, 4).map(cat => (
+                          <span key={cat.name} className="text-xs px-2 py-1 bg-white/60 rounded-full text-warmgray-600">
+                            {language === 'zh' ? cat.name : cat.nameEn}
+                          </span>
+                        ))}
+                        {platform.categories.length > 4 && (
+                          <span className="text-xs px-2 py-1 bg-white/60 rounded-full text-warmgray-500">
+                            +{platform.categories.length - 4}
+                          </span>
+                        )}
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Quick tip */}
+              <div className="text-center text-warmgray-500 text-sm mt-8">
+                <Globe className="w-4 h-4 inline-block mr-2" />
+                {txt.tip}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Selected Platform View */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="mb-8"
+              >
+                {/* Back button and platform header */}
+                <div className="flex items-center justify-between mb-6">
+                  <button
+                    onClick={() => {
+                      setSelectedPlatform(null)
+                      setIframeUrl(null)
+                    }}
+                    className="flex items-center gap-2 text-warmgray-600 hover:text-warmgray-900 transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4 rotate-180" />
+                    {txt.backToPlatforms}
+                  </button>
+                  
+                  <a
+                    href={selectedPlatformData?.baseUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg ${selectedPlatformData?.bgColor} ${selectedPlatformData?.textColor} hover:shadow-md transition-all`}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    {txt.viewOnPlatform}
+                  </a>
+                </div>
+
+                {/* Platform info */}
+                <div className={`${selectedPlatformData?.bgColor} rounded-2xl p-6 mb-8`}>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${selectedPlatformData?.color} flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
+                      {selectedPlatformData?.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h2 className={`text-2xl font-bold ${selectedPlatformData?.textColor}`}>
+                        {selectedPlatformData?.name}
+                      </h2>
+                      <p className="text-warmgray-600">
+                        {language === 'zh' ? selectedPlatformData?.description : selectedPlatformData?.descriptionEn}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Category grid */}
+                <h3 className="text-lg font-semibold text-warmgray-800 mb-4 flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5" />
+                  {txt.selectCategory}
+                </h3>
+                
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {selectedPlatformData?.categories.map((category, index) => {
+                    const IconComponent = category.icon
+                    return (
+                      <motion.button
+                        key={category.name}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05 * index }}
+                        onClick={() => handleCategoryClick(category.url)}
+                        className="bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300 group border border-warmgray-100 hover:border-terracotta-200 text-left"
+                      >
+                        <div className={`w-12 h-12 rounded-lg ${selectedPlatformData?.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                          <IconComponent className={`w-6 h-6 ${selectedPlatformData?.textColor}`} />
+                        </div>
+                        <h4 className="font-semibold text-warmgray-800 group-hover:text-terracotta-600 transition-colors">
+                          {language === 'zh' ? category.name : category.nameEn}
+                        </h4>
+                        <div className="flex items-center gap-1 mt-2 text-sm text-warmgray-500">
+                          <span>{txt.openInNewTab}</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </div>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+
+                {/* Info tip */}
+                <div className="text-center text-warmgray-500 text-sm mt-8 p-4 bg-warmgray-100 rounded-lg">
+                  <Globe className="w-4 h-4 inline-block mr-2" />
+                  {txt.tipEmbedded}
+                </div>
+              </motion.div>
+            </>
           )}
         </div>
       </main>
@@ -598,4 +801,3 @@ export default function FurniturePage() {
     </div>
   )
 }
-

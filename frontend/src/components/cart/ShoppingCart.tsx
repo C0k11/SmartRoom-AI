@@ -123,8 +123,24 @@ ${i + 1}. ${item.name}
                       exit={{ opacity: 0, x: -100 }}
                       className="flex gap-4 p-4 bg-warmgray-50 rounded-xl"
                     >
-                      {/* Image placeholder */}
-                      <div className="w-20 h-20 bg-warmgray-200 rounded-lg flex-shrink-0" />
+                      {/* Product Image */}
+                      <div className="w-20 h-20 bg-warmgray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                        {item.image ? (
+                          <img 
+                            src={item.image} 
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.style.display = 'none'
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-warmgray-400 text-xs">
+                            {item.brand || 'Product'}
+                          </div>
+                        )}
+                      </div>
                       
                       <div className="flex-1 min-w-0">
                         <h4 className="font-semibold text-warmgray-900 truncate">
