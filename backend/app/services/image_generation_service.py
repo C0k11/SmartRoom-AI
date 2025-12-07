@@ -456,9 +456,9 @@ class ImageGenerationService:
         # Using Unsplash for high-quality placeholder images
         placeholders = {
             "modern": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200",
-            "nordic": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1200",
-            "japanese": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200",
-            "industrial": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200",
+            "nordic": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200",
+            "japanese": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1200",
+            "industrial": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200",
             "minimalist": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200",
         }
         return placeholders.get(style, placeholders["modern"])

@@ -9,27 +9,22 @@ import {
   Download,
   Share2,
   Heart,
-  Box,
   Check,
   ExternalLink,
   RefreshCw,
   AlertCircle,
   Copy,
   X,
-  Save
+  Save,
+  Maximize2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 import { useDesignStore, DesignProposal } from '@/store/designStore'
 import { designApi, analysisApi } from '@/lib/api'
 import { useLanguage, formatCAD } from '@/lib/i18n'
 import { useAuth } from '@/lib/auth'
 import toast from 'react-hot-toast'
-import dynamic from 'next/dynamic'
-
-// Dynamic import for 3D preview (client-side only)
-const Preview3D = dynamic(
-  () => import('./Preview3D').then(mod => mod.Preview3D),
-  { ssr: false, loading: () => <div>Loading 3D...</div> }
-)
 
 // Fallback design data with i18n support
 const fallbackDesignsData = {
@@ -52,13 +47,13 @@ const fallbackDesignsData = {
       id: 'fallback-2',
       name: '禅意栖居',
       description: '极简日式美学，营造宁静致远的生活空间',
-      image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
+      image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1200&q=80',
       style: '日式禅风',
       confidence: 0.92,
       highlights: ['极简设计', '自然材质', '禅意氛围'],
       totalCost: 7200,
       furniture: [
-        { id: 'f5', name: '榻榻米沙发', category: '沙发', price: 2800, image: '', link: 'https://www.taobao.com', dimensions: '200x90x35cm', brand: 'Muzhi Studio' },
+        { id: 'f5', name: '榻榻米沙发', category: '沙发', price: 2800, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200', link: 'https://www.taobao.com', dimensions: '200x90x35cm', brand: 'Muzhi Studio' },
       ],
     },
   ],
@@ -81,13 +76,13 @@ const fallbackDesignsData = {
       id: 'fallback-2',
       name: 'Zen Retreat',
       description: 'Minimalist Japanese aesthetics, creating a serene and peaceful living space',
-      image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
+      image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1200&q=80',
       style: 'Japanese Zen',
       confidence: 0.92,
       highlights: ['Minimalist Design', 'Natural Materials', 'Zen Atmosphere'],
       totalCost: 7200,
       furniture: [
-        { id: 'f5', name: 'Tatami Sofa', category: 'Sofa', price: 2800, image: '', link: 'https://www.amazon.com', dimensions: '200x90x35cm', brand: 'Muzhi Studio' },
+        { id: 'f5', name: 'Tatami Sofa', category: 'Sofa', price: 2800, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200', link: 'https://www.amazon.com', dimensions: '200x90x35cm', brand: 'Muzhi Studio' },
       ],
     },
   ],
@@ -121,7 +116,7 @@ export function DesignResults() {
   const currentJobIdRef = useRef<string | null>(null) // Track current job
   
   // New states for features
-  const [show3DPreview, setShow3DPreview] = useState(false)
+  const [showFullscreen, setShowFullscreen] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
   const [shareLink, setShareLink] = useState('')
 
@@ -320,7 +315,7 @@ export function DesignResults() {
       shoppingList: '购物清单',
       original: '原始照片',
       designEffect: '设计效果',
-      preview3D: '3D预览',
+      fullscreen: '全屏对比',
       download: '下载方案',
       share: '分享',
       save: '保存',
@@ -359,7 +354,7 @@ export function DesignResults() {
       shoppingList: 'Shopping List',
       original: 'Original Photo',
       designEffect: 'Design Effect',
-      preview3D: '3D Preview',
+      fullscreen: 'Full View',
       download: 'Download',
       share: 'Share',
       save: 'Save',
@@ -754,11 +749,11 @@ export function DesignResults() {
                     {/* Actions */}
                     <div className="flex flex-wrap gap-3 pt-4">
                       <button 
-                        onClick={() => setShow3DPreview(true)}
+                        onClick={() => setShowFullscreen(true)}
                         className="btn-primary flex items-center gap-2"
                       >
-                        <Box className="w-5 h-5" />
-                        {txt.preview3D}
+                        <Maximize2 className="w-5 h-5" />
+                        {txt.fullscreen}
                       </button>
                       <button 
                         onClick={handleDownload}
@@ -901,14 +896,58 @@ export function DesignResults() {
         </div>
       </div>
 
-      {/* 3D Preview Modal */}
-      {show3DPreview && selectedDesign && (
-        <Preview3D
-          isOpen={show3DPreview}
-          onClose={() => setShow3DPreview(false)}
-          imageUrl={selectedDesign.image}
-          designName={selectedDesign.name}
-        />
+      {/* Fullscreen Image Comparison Modal */}
+      {showFullscreen && selectedDesign && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 bg-black/80">
+            <h3 className="text-white font-bold text-lg">{selectedDesign.name}</h3>
+            <button
+              onClick={() => setShowFullscreen(false)}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          
+          {/* Images */}
+          <div className="flex-1 flex items-center justify-center gap-4 p-4">
+            {/* Original */}
+            <div className="flex-1 flex flex-col items-center">
+              <p className="text-white/60 text-sm mb-2">{txt.original}</p>
+              <img 
+                src={uploadedImage || '/placeholder-room.jpg'} 
+                alt="Original" 
+                className="max-h-[70vh] max-w-full object-contain rounded-lg"
+              />
+            </div>
+            
+            {/* Arrow */}
+            <div className="text-white/40">
+              <ChevronRight className="w-8 h-8" />
+            </div>
+            
+            {/* Design Effect */}
+            <div className="flex-1 flex flex-col items-center">
+              <p className="text-white/60 text-sm mb-2">{txt.designEffect}</p>
+              <img 
+                src={selectedDesign.image} 
+                alt="Design" 
+                className="max-h-[70vh] max-w-full object-contain rounded-lg"
+              />
+            </div>
+          </div>
+          
+          {/* Info */}
+          <div className="p-4 bg-black/80 text-center">
+            <p className="text-white/80">{selectedDesign.description}</p>
+            <div className="flex justify-center gap-2 mt-2">
+              {selectedDesign.highlights?.map((h: string, i: number) => (
+                <span key={i} className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-sm">{h}</span>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Share Modal */}

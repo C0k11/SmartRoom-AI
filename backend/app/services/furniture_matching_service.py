@@ -16,32 +16,32 @@ PLATFORMS = {
         "currency": "CAD",
         "currency_symbol": "$",
         "platforms": [
-            {"name": "Amazon Canada", "url": "https://www.amazon.ca/s?k={query}"},
-            {"name": "Best Buy Canada", "url": "https://www.bestbuy.ca/en-ca/search?search={query}"},
-            {"name": "IKEA Canada", "url": "https://www.ikea.com/ca/en/search/?q={query}"},
-            {"name": "Wayfair Canada", "url": "https://www.wayfair.ca/keyword.html?keyword={query}"},
-            {"name": "Structube", "url": "https://www.structube.com/en_ca/search?q={query}"},
+            {"name": "Amazon Canada", "url": "https://www.amazon.ca/s?k={query}", "icon": "🛒"},
+            {"name": "Best Buy Canada", "url": "https://www.bestbuy.ca/en-ca/search?search={query}", "icon": "💻"},
+            {"name": "IKEA Canada", "url": "https://www.ikea.com/ca/en/search/?q={query}", "icon": "🏠"},
+            {"name": "Wayfair Canada", "url": "https://www.wayfair.ca/keyword.html?keyword={query}", "icon": "🛋️"},
+            {"name": "Structube", "url": "https://www.structube.com/en_ca/search?q={query}", "icon": "🪑"},
         ]
     },
     "US": {  # United States
         "currency": "USD",
         "currency_symbol": "$",
         "platforms": [
-            {"name": "Amazon US", "url": "https://www.amazon.com/s?k={query}"},
-            {"name": "Best Buy US", "url": "https://www.bestbuy.com/site/searchpage.jsp?st={query}"},
-            {"name": "IKEA US", "url": "https://www.ikea.com/us/en/search/?q={query}"},
-            {"name": "Wayfair US", "url": "https://www.wayfair.com/keyword.html?keyword={query}"},
-            {"name": "Target", "url": "https://www.target.com/s?searchTerm={query}"},
+            {"name": "Amazon US", "url": "https://www.amazon.com/s?k={query}", "icon": "🛒"},
+            {"name": "Best Buy US", "url": "https://www.bestbuy.com/site/searchpage.jsp?st={query}", "icon": "💻"},
+            {"name": "IKEA US", "url": "https://www.ikea.com/us/en/search/?q={query}", "icon": "🏠"},
+            {"name": "Wayfair US", "url": "https://www.wayfair.com/keyword.html?keyword={query}", "icon": "🛋️"},
+            {"name": "Target", "url": "https://www.target.com/s?searchTerm={query}", "icon": "🎯"},
         ]
     },
     "CN": {  # China
         "currency": "CNY",
         "currency_symbol": "¥",
         "platforms": [
-            {"name": "淘宝", "url": "https://s.taobao.com/search?q={query}"},
-            {"name": "天猫", "url": "https://list.tmall.com/search_product.htm?q={query}"},
-            {"name": "京东", "url": "https://search.jd.com/Search?keyword={query}"},
-            {"name": "宜家中国", "url": "https://www.ikea.cn/cn/zh/search/?q={query}"},
+            {"name": "淘宝", "url": "https://s.taobao.com/search?q={query}", "icon": "🛒"},
+            {"name": "天猫", "url": "https://list.tmall.com/search_product.htm?q={query}", "icon": "🐱"},
+            {"name": "京东", "url": "https://search.jd.com/Search?keyword={query}", "icon": "📦"},
+            {"name": "宜家中国", "url": "https://www.ikea.cn/cn/zh/search/?q={query}", "icon": "🏠"},
         ]
     },
 }

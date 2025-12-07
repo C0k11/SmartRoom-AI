@@ -12,7 +12,7 @@ const designStyles: (DesignStyle & { descEn: string })[] = [
     nameEn: 'Modern Minimalist',
     description: '简洁线条，功能性设计，中性色调',
     descEn: 'Clean lines, functional design, neutral tones',
-    image: '/styles/modern.jpg',
+    image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=500&fit=crop',
     colors: ['#FFFFFF', '#1A1A1A', '#C4C4C4', '#8B7355'],
   },
   {
@@ -21,7 +21,7 @@ const designStyles: (DesignStyle & { descEn: string })[] = [
     nameEn: 'Scandinavian',
     description: '自然材质，明亮空间，温暖木质',
     descEn: 'Natural materials, bright spaces, warm wood',
-    image: '/styles/nordic.jpg',
+    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=500&fit=crop',
     colors: ['#FEFEFE', '#E8DED1', '#6B8E6B', '#D4A574'],
   },
   {
@@ -30,7 +30,7 @@ const designStyles: (DesignStyle & { descEn: string })[] = [
     nameEn: 'Japanese Zen',
     description: '极简美学，自然元素，宁静氛围',
     descEn: 'Minimalist aesthetics, natural elements, serene atmosphere',
-    image: '/styles/japanese.jpg',
+    image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=400&h=500&fit=crop',
     colors: ['#F5F1EB', '#3D3D3D', '#8B9A6B', '#C9B896'],
   },
   {
@@ -39,7 +39,7 @@ const designStyles: (DesignStyle & { descEn: string })[] = [
     nameEn: 'Industrial',
     description: '裸露材质，金属元素，粗犷美感',
     descEn: 'Exposed materials, metal elements, rugged beauty',
-    image: '/styles/industrial.jpg',
+    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=500&fit=crop',
     colors: ['#4A4A4A', '#8B4513', '#2F2F2F', '#C9C9C9'],
   },
   {
@@ -48,7 +48,7 @@ const designStyles: (DesignStyle & { descEn: string })[] = [
     nameEn: 'Bohemian',
     description: '色彩丰富，自由混搭，异域风情',
     descEn: 'Rich colors, eclectic mix, exotic vibes',
-    image: '/styles/bohemian.jpg',
+    image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=400&h=500&fit=crop',
     colors: ['#D2691E', '#8B4513', '#228B22', '#4169E1'],
   },
   {
@@ -57,7 +57,7 @@ const designStyles: (DesignStyle & { descEn: string })[] = [
     nameEn: 'Mid-Century Modern',
     description: '复古造型，有机曲线，经典配色',
     descEn: 'Retro shapes, organic curves, classic colors',
-    image: '/styles/midcentury.jpg',
+    image: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=400&h=500&fit=crop',
     colors: ['#DAA520', '#2F4F4F', '#CD853F', '#F4A460'],
   },
   {
@@ -66,7 +66,7 @@ const designStyles: (DesignStyle & { descEn: string })[] = [
     nameEn: 'Coastal',
     description: '清新蓝白，自然纹理，度假氛围',
     descEn: 'Fresh blue-white, natural textures, vacation vibes',
-    image: '/styles/coastal.jpg',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=500&fit=crop',
     colors: ['#FFFFFF', '#87CEEB', '#F5DEB3', '#4682B4'],
   },
   {
@@ -75,7 +75,7 @@ const designStyles: (DesignStyle & { descEn: string })[] = [
     nameEn: 'Farmhouse',
     description: '乡村温馨，复古元素，舒适自然',
     descEn: 'Rustic warmth, vintage elements, cozy natural',
-    image: '/styles/farmhouse.jpg',
+    image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=400&h=500&fit=crop',
     colors: ['#F5F5DC', '#8B7355', '#556B2F', '#D2B48C'],
   },
 ]
@@ -102,19 +102,22 @@ export function StyleSelector() {
             }
           `}
         >
-          {/* Image placeholder with gradient */}
+          {/* Real preview image */}
           <div className="aspect-[4/5] relative overflow-hidden">
+            <img 
+              src={style.image}
+              alt={style.name}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              loading="lazy"
+            />
+            
+            {/* Fallback gradient if image fails */}
             <div 
-              className="absolute inset-0"
+              className="absolute inset-0 -z-10"
               style={{
                 background: `linear-gradient(135deg, ${style.colors[0]} 0%, ${style.colors[1]} 50%, ${style.colors[2]} 100%)`,
               }}
             />
-            
-            {/* Decorative elements to simulate room */}
-            <div className="absolute inset-0 flex items-end justify-center p-4">
-              <div className="w-full h-2/3 rounded-t-lg opacity-20" style={{ backgroundColor: style.colors[3] }} />
-            </div>
             
             {/* Overlay gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

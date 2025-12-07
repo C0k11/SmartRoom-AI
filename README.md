@@ -13,14 +13,15 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 ## Implemented Features
 
 ### User System
-- [x] User registration & login
+- [x] User registration and login
+- [x] Google OAuth login
 - [x] JWT authentication
 - [x] Protected routes (design features require login)
 - [x] Persistent user sessions
 
 ### Room Analysis
 - [x] Image upload with preview
-- [x] **Custom room description** - Users can describe room characteristics for more accurate AI analysis
+- [x] Custom room description - Users can describe room characteristics for more accurate AI analysis
 - [x] Claude AI smart analysis of room type, dimensions, existing furniture
 - [x] Visual display of analysis results
 
@@ -33,32 +34,44 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 - [x] Budget range selection
 - [x] Color preference selection
 - [x] Keep existing furniture option
-- [x] **Furniture suggestions input** - Users can specify desired furniture/brands, AI strictly follows
+- [x] Furniture suggestions input - Users can specify desired furniture/brands, AI strictly follows
 - [x] Special requirements (workspace, gaming area, reading nook, etc.)
 
 ### AI Image Generation
-- [x] **Auto Chinese-to-English translation** - Chinese requirements auto-translated to English prompts
+- [x] Auto Chinese-to-English translation - Chinese requirements auto-translated to English prompts
 - [x] FLUX Pro / DALL-E 3 high-quality image generation
 - [x] Multiple proposals (3 different design schemes)
 - [x] Real-time progress display
 - [x] Auto-retry on generation failure
 
 ### Smart Product Recommendations
-- [x] **Claude AI product search** - Intelligent furniture and electronics recommendations
+- [x] Claude AI product search - Intelligent furniture and electronics recommendations
 - [x] Brand recognition (ASUS, MSI, Apple, IKEA, etc.)
-- [x] **Multi-platform purchase links**:
+- [x] Multi-platform purchase links:
   - Canada: Amazon, Best Buy, IKEA, Wayfair, Structube
   - US: Amazon, Best Buy, IKEA, Wayfair, Target
   - China: Taobao, Tmall, JD.com, IKEA China
 - [x] Realistic price estimates (CAD/USD/CNY)
 - [x] Automatic total cost calculation
 
-### 3D Preview
-- [x] Three.js 3D room visualization
-- [x] Drag to rotate, scroll to zoom, right-click to pan
-- [x] Fullscreen immersive preview
+### Shopping Cart
+- [x] Add recommended products to cart
+- [x] Quantity management
+- [x] Persistent cart storage
+- [x] Direct purchase links to retailers
 
-### Export & Share
+### Furniture Marketplace
+- [x] Multi-region support (China, Canada, Japan)
+- [x] Platform directory with category links
+- [x] Direct links to Taobao, Tmall, JD, Amazon, IKEA, etc.
+- [x] Category-based browsing (Sofas, Beds, Chairs, Tables, Lighting, Storage)
+
+### Design Preview
+- [x] Fullscreen before/after comparison
+- [x] Side-by-side original and design effect view
+- [x] Design highlights display
+
+### Export and Share
 - [x] Download design images (PNG)
 - [x] Generate share links
 - [x] Social media sharing (Twitter, Facebook, WeChat)
@@ -157,10 +170,18 @@ pip install -r requirements.txt
 
 4. **Configure environment variables**
 
-Copy `backend/env.example` to `backend/.env` and fill in your API keys:
+Backend - Copy `backend/env.example` to `backend/.env`:
 ```env
 ANTHROPIC_API_KEY=your_claude_api_key
 REPLICATE_API_TOKEN=your_replicate_token
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+Frontend - Copy `frontend/env.example` to `frontend/.env.local`:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
 ```
 
 5. **Start the services**
@@ -214,23 +235,24 @@ npx eas-cli build --platform ios
 
 ## User Flow
 
-1. **Register/Login** - Create an account or sign in
-2. **Upload Photo** - Take or upload a room photo
-3. **Describe Room** - Optionally describe room characteristics
-4. **Select Style** - Choose your preferred design style
-5. **Set Preferences** - Budget, colors, special requirements
-6. **Add Suggestions** - Specify desired furniture/brands
-7. **Generate Designs** - AI generates multiple design proposals
-8. **View Results** - 3D preview, download, share
+1. Register/Login - Create an account or sign in with Google
+2. Upload Photo - Take or upload a room photo
+3. Describe Room - Optionally describe room characteristics
+4. Select Style - Choose your preferred design style
+5. Set Preferences - Budget, colors, special requirements
+6. Add Suggestions - Specify desired furniture/brands
+7. Generate Designs - AI generates multiple design proposals
+8. View Results - Fullscreen comparison, download, share
+9. Shop Products - Add recommended items to cart, browse furniture marketplace
 
 ## Future Plans
 
 - [ ] Integrate more image generation models (Midjourney API)
 - [ ] Real product API integration (live pricing)
 - [ ] Cloud sync for user accounts
-- [ ] AR augmented reality preview
 - [ ] Multi-room project management
 - [ ] Designer collaboration features
+- [ ] AI-powered 3D room reconstruction from photos
 
 ## Author
 

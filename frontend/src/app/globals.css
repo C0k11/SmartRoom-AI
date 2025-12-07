@@ -80,7 +80,7 @@
 
   /* Button styles - Modern Blue */
   .btn-primary {
-    @apply px-6 py-3 text-white font-medium rounded-xl transition-all duration-300;
+    @apply inline-flex items-center px-6 py-3 text-white font-medium rounded-xl transition-all duration-300;
     background: linear-gradient(to right, #3b82f6, #2563eb);
     box-shadow: 0 10px 15px -3px rgb(59 130 246 / 0.25);
   }

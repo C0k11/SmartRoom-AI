@@ -17,7 +17,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>
   register: (email: string, password: string, name: string) => Promise<boolean>
   logout: () => void
-  loginWithOAuth: (provider: 'google' | 'github') => Promise<boolean>
+  loginWithOAuth: (provider: 'google' | 'github', credential?: string) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -111,24 +111,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const loginWithOAuth = async (provider: 'google' | 'github'): Promise<boolean> => {
+  const loginWithOAuth = async (provider: 'google' | 'github', credential?: string): Promise<boolean> => {
     try {
-      // In production, redirect to OAuth provider
-      // For demo, simulate successful OAuth login
-      const mockUser: User = {
-        id: 'oauth-user-' + Date.now(),
-        email: `user@${provider}.com`,
-        name: `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`,
+      if (provider === 'google' && credential) {
+        // Real Google OAuth with credential
+        const response = await userApi.googleAuth(credential)
+        
+        if (!response || !response.user || !response.access_token) {
+          throw new Error('Invalid response from server')
+        }
+        
+        const user: User = {
+          id: response.user.id,
+          email: response.user.email,
+          name: response.user.name,
+          avatar: response.user.avatar,
+        }
+        
+        localStorage.setItem('user', JSON.stringify(user))
+        localStorage.setItem('token', response.access_token)
+        setUser(user)
+        
+        console.log('Google OAuth login successful:', user)
+        return true
       }
       
-      setUser(mockUser)
-      localStorage.setItem('user', JSON.stringify(mockUser))
-      localStorage.setItem('token', 'oauth-token-' + Date.now())
-      
-      return true
-    } catch (error) {
-      console.error('OAuth login failed:', error)
+      // Fallback for other providers or no credential
+      console.error('OAuth provider not supported or missing credential')
       return false
+    } catch (error: any) {
+      console.error('OAuth login failed:', error)
+      throw new Error(error.response?.data?.detail || error.message || 'OAuth login failed')
     }
   }
 
