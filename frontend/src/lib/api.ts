@@ -159,6 +159,12 @@ export const userApi = {
     return response.data
   },
   
+  // Google OAuth login
+  googleAuth: async (credential: string) => {
+    const response = await api.post('/users/auth/google', { credential })
+    return response.data
+  },
+  
   getMe: async () => {
     const response = await api.get('/users/me')
     return response.data
@@ -171,6 +177,26 @@ export const userApi = {
   
   getDesigns: async () => {
     const response = await api.get('/users/me/designs')
+    return response.data
+  },
+  
+  // Save a design to history
+  saveDesign: async (design: {
+    name: string
+    description?: string
+    image_url: string
+    original_image?: string
+    style: string
+    total_cost: number
+    furniture_items?: any[]
+  }) => {
+    const response = await api.post('/users/me/designs', design)
+    return response.data
+  },
+  
+  // Delete a saved design
+  deleteDesign: async (designId: string) => {
+    const response = await api.delete(`/users/me/designs/${designId}`)
     return response.data
   },
 }

@@ -12,9 +12,13 @@ class User(Base):
     
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    hashed_password: Mapped[str] = mapped_column(String(255))
+    hashed_password: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)  # Nullable for OAuth users
     name: Mapped[str] = mapped_column(String(100))
     avatar: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    
+    # OAuth fields
+    oauth_provider: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # 'google', 'github', etc.
+    oauth_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)  # Provider's user ID
     
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_premium: Mapped[bool] = mapped_column(Boolean, default=False)

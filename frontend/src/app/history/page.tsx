@@ -128,10 +128,10 @@ export default function HistoryPage() {
 
   const deleteItem = async (id: string) => {
     try {
-      // TODO: Call backend API to delete design when endpoint is available
-      // if (isAuthenticated) {
-      //   await userApi.deleteDesign(id)
-      // }
+      // Call backend API to delete design
+      if (isAuthenticated) {
+        await userApi.deleteDesign(id)
+      }
       
       // Update local state and localStorage
       const updated = history.filter(h => h.id !== id)

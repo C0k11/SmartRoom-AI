@@ -26,7 +26,7 @@ const designStyles = [
     materialsEn: ['Marble', 'Metal', 'Glass', 'Concrete'],
     bestFor: ['都市公寓', '办公空间', '追求效率的生活方式'],
     bestForEn: ['Urban Apartments', 'Office Spaces', 'Efficiency-focused Living'],
-    image: '/styles/modern-detail.jpg',
+    image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=600&fit=crop',
   },
   {
     id: 'nordic',
@@ -41,7 +41,7 @@ const designStyles = [
     materialsEn: ['Oak', 'Pine', 'Linen', 'Wool', 'Ceramics'],
     bestFor: ['家庭住宅', '需要温馨氛围', '喜爱自然元素'],
     bestForEn: ['Family Homes', 'Cozy Atmosphere', 'Nature Lovers'],
-    image: '/styles/nordic-detail.jpg',
+    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
   },
   {
     id: 'japanese',
@@ -56,7 +56,7 @@ const designStyles = [
     materialsEn: ['Bamboo', 'Washi Paper', 'Tatami', 'Raw Wood', 'Stone'],
     bestFor: ['追求内心平静', '冥想空间', '茶室书房'],
     bestForEn: ['Inner Peace', 'Meditation Spaces', 'Tea Rooms'],
-    image: '/styles/japanese-detail.jpg',
+    image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&h=600&fit=crop',
   },
   {
     id: 'industrial',
@@ -71,7 +71,7 @@ const designStyles = [
     materialsEn: ['Iron', 'Red Brick', 'Cement', 'Leather', 'Reclaimed Wood'],
     bestFor: ['LOFT公寓', '工作室', '创意空间'],
     bestForEn: ['Loft Apartments', 'Studios', 'Creative Spaces'],
-    image: '/styles/industrial-detail.jpg',
+    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop',
   },
   {
     id: 'bohemian',
@@ -86,7 +86,7 @@ const designStyles = [
     materialsEn: ['Cotton Linen', 'Rattan', 'Tassels', 'Rugs', 'Clay'],
     bestFor: ['艺术家住所', '喜爱旅行者', '个性表达'],
     bestForEn: ['Artist Homes', 'Travel Lovers', 'Self Expression'],
-    image: '/styles/bohemian-detail.jpg',
+    image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&h=600&fit=crop',
   },
   {
     id: 'midcentury',
@@ -101,7 +101,7 @@ const designStyles = [
     materialsEn: ['Walnut', 'Teak', 'Brass', 'Velvet', 'Leather'],
     bestFor: ['设计爱好者', '复古品味', '经典永恒'],
     bestForEn: ['Design Lovers', 'Vintage Taste', 'Timeless Classic'],
-    image: '/styles/midcentury-detail.jpg',
+    image: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=800&h=600&fit=crop',
   },
   {
     id: 'coastal',
@@ -116,7 +116,7 @@ const designStyles = [
     materialsEn: ['Linen', 'Cotton', 'Rattan', 'Shells', 'Driftwood'],
     bestFor: ['海边住宅', '度假屋', '追求放松'],
     bestForEn: ['Beach Houses', 'Vacation Homes', 'Relaxation Seekers'],
-    image: '/styles/coastal-detail.jpg',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop',
   },
   {
     id: 'farmhouse',
@@ -131,7 +131,7 @@ const designStyles = [
     materialsEn: ['Distressed Wood', 'Cast Iron', 'Ceramics', 'Linen', 'Stone'],
     bestFor: ['郊区住宅', '家庭生活', '田园向往'],
     bestForEn: ['Suburban Homes', 'Family Living', 'Country Living'],
-    image: '/styles/farmhouse-detail.jpg',
+    image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&h=600&fit=crop',
   },
 ]
 
@@ -148,7 +148,7 @@ export default function ExplorePage() {
       characteristics: '风格特点',
       materials: '常用材质',
       bestFor: '适合场景',
-      useStyle: '使用{style}风格开始设计',
+      useStyle: '使用{style}开始设计',
     },
     en: {
       title: 'Explore Design Styles',
@@ -158,7 +158,7 @@ export default function ExplorePage() {
       characteristics: 'Characteristics',
       materials: 'Materials',
       bestFor: 'Best For',
-      useStyle: 'Start Design with {style}',
+      useStyle: 'Start Design with {style} Style',
     }
   }
   const txt = texts[language]
@@ -240,13 +240,15 @@ export default function ExplorePage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-2xl shadow-sm overflow-hidden"
               >
-                {/* Hero image placeholder */}
-                <div 
-                  className="h-64 md:h-80 relative"
-                  style={{
-                    background: `linear-gradient(135deg, ${selectedStyle.colors[0]} 0%, ${selectedStyle.colors[1]} 30%, ${selectedStyle.colors[2]} 60%, ${selectedStyle.colors[3]} 100%)`,
-                  }}
-                >
+                {/* Hero image with real photo */}
+                <div className="h-64 md:h-80 relative overflow-hidden">
+                  <img 
+                    src={selectedStyle.image}
+                    alt={selectedStyle.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  {/* Overlay gradient for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
                       <h2 className="text-4xl font-display font-bold text-white drop-shadow-lg mb-2">
@@ -325,10 +327,10 @@ export default function ExplorePage() {
                   {/* CTA */}
                   <Link
                     href={`/design?style=${selectedStyle.id}`}
-                    className="btn-primary w-full justify-center text-lg"
+                    className="btn-primary w-full flex items-center justify-center text-lg"
                   >
-                    {txt.useStyle.replace('{style}', language === 'zh' ? selectedStyle.name : selectedStyle.nameEn)}
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <span>{txt.useStyle.replace('{style}', language === 'zh' ? selectedStyle.name : selectedStyle.nameEn)}</span>
+                    <ArrowRight className="w-5 h-5 ml-2 flex-shrink-0" />
                   </Link>
                 </div>
               </motion.div>
