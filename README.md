@@ -18,6 +18,7 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 - [x] JWT authentication
 - [x] Protected routes (design features require login)
 - [x] Persistent user sessions
+- [x] SQLite database for user data persistence
 
 ### Room Analysis
 - [x] Image upload with preview
@@ -77,10 +78,12 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 - [x] Social media sharing (Twitter, Facebook, WeChat)
 - [x] Save to history
 
-### History
-- [x] Save design proposals locally
+### History & Cloud Sync
+- [x] Per-account design history storage
+- [x] SQLite database persistence (survives server restarts)
 - [x] History page to view all saved designs
 - [x] Preview, download, delete historical designs
+- [x] Automatic sync between frontend and backend
 
 ### Multilingual Support
 - [x] Chinese/English toggle
@@ -126,6 +129,7 @@ SmartRoom-AI is an intelligent interior design assistant powered by artificial i
 | Technology | Purpose |
 |------------|---------|
 | FastAPI | High-performance Python API |
+| SQLite | User & design data persistence |
 | Claude AI | Room analysis, product recommendations, translation |
 | FLUX / DALL-E | AI image generation |
 | Replicate | ML model hosting |
@@ -249,7 +253,7 @@ npx eas-cli build --platform ios
 
 - [ ] Integrate more image generation models (Midjourney API)
 - [ ] Real product API integration (live pricing)
-- [ ] Cloud sync for user accounts
+- [ ] PostgreSQL database for production
 - [ ] Multi-room project management
 - [ ] Designer collaboration features
 - [ ] AI-powered 3D room reconstruction from photos

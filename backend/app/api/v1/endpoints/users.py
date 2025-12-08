@@ -5,11 +5,70 @@ import uuid
 from datetime import datetime, timedelta
 import logging
 import httpx
+import json
+import os
 from jose import jwt, JWTError
 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
+
+# SQLite persistence for user data
+import sqlite3
+from pathlib import Path
+
+DB_PATH = Path(__file__).parent.parent.parent.parent / "data" / "users.db"
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+def get_db_connection():
+    """Get SQLite database connection"""
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    """Initialize database tables"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Users table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            password TEXT,
+            avatar TEXT,
+            created_at TEXT NOT NULL,
+            is_premium INTEGER DEFAULT 0,
+            oauth_provider TEXT,
+            oauth_id TEXT,
+            preferences TEXT
+        )
+    ''')
+    
+    # Designs table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS designs (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            image_url TEXT,
+            original_image TEXT,
+            style TEXT,
+            total_cost REAL DEFAULT 0,
+            furniture_items TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+# Initialize database on module load
+init_db()
 
 router = APIRouter()
 
@@ -77,9 +136,114 @@ class SavedDesign(BaseModel):
     created_at: str
 
 
-# In-memory storage (replace with database in production)
-users_db: dict = {}
-designs_db: dict = {}  # user_id -> list of designs
+# Database helper functions
+def get_user_by_id(user_id: str) -> Optional[dict]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return dict(row)
+    return None
+
+def get_user_by_email(email: str) -> Optional[dict]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return dict(row)
+    return None
+
+def get_user_by_oauth_id(oauth_id: str) -> Optional[dict]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users WHERE oauth_id = ?', (oauth_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return dict(row)
+    return None
+
+def create_user(user_data: dict) -> dict:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO users (id, email, name, password, avatar, created_at, is_premium, oauth_provider, oauth_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        user_data['id'],
+        user_data['email'],
+        user_data['name'],
+        user_data.get('password'),
+        user_data.get('avatar'),
+        user_data['created_at'],
+        1 if user_data.get('is_premium') else 0,
+        user_data.get('oauth_provider'),
+        user_data.get('oauth_id'),
+    ))
+    conn.commit()
+    conn.close()
+    return user_data
+
+def update_user(user_id: str, updates: dict):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    set_clause = ', '.join([f"{k} = ?" for k in updates.keys()])
+    values = list(updates.values()) + [user_id]
+    cursor.execute(f'UPDATE users SET {set_clause} WHERE id = ?', values)
+    conn.commit()
+    conn.close()
+
+def get_user_designs(user_id: str) -> List[dict]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM designs WHERE user_id = ? ORDER BY created_at DESC', (user_id,))
+    rows = cursor.fetchall()
+    conn.close()
+    designs = []
+    for row in rows:
+        design = dict(row)
+        if design.get('furniture_items'):
+            design['furniture_items'] = json.loads(design['furniture_items'])
+        else:
+            design['furniture_items'] = []
+        designs.append(design)
+    return designs
+
+def save_design(user_id: str, design_data: dict) -> dict:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    furniture_items = json.dumps(design_data.get('furniture_items', []))
+    cursor.execute('''
+        INSERT INTO designs (id, user_id, name, description, image_url, original_image, style, total_cost, furniture_items, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        design_data['id'],
+        user_id,
+        design_data['name'],
+        design_data.get('description'),
+        design_data['image_url'],
+        design_data.get('original_image'),
+        design_data['style'],
+        design_data.get('total_cost', 0),
+        furniture_items,
+        design_data['created_at'],
+    ))
+    conn.commit()
+    conn.close()
+    return design_data
+
+def delete_design_by_id(user_id: str, design_id: str) -> bool:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM designs WHERE id = ? AND user_id = ?', (design_id, user_id))
+    deleted = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return deleted
 
 
 def create_access_token(user_id: str) -> str:
@@ -118,12 +282,11 @@ async def register(user: UserCreate):
     logger.info(f"Register request received: {user.email}, {user.name}")
     
     # Check if email exists
-    for u in users_db.values():
-        if u["email"] == user.email:
-            raise HTTPException(status_code=400, detail="Email already registered")
+    if get_user_by_email(user.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
     
     user_id = str(uuid.uuid4())
-    users_db[user_id] = {
+    user_data = {
         "id": user_id,
         "email": user.email,
         "name": user.name,
@@ -134,27 +297,28 @@ async def register(user: UserCreate):
         "oauth_provider": None,
         "oauth_id": None,
     }
+    create_user(user_data)
     
     access_token = create_access_token(user_id)
     
     return TokenResponse(
         access_token=access_token,
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        user=UserResponse(**{k: v for k, v in users_db[user_id].items() if k not in ["password", "oauth_id"]}),
+        user=UserResponse(**{k: v for k, v in user_data.items() if k not in ["password", "oauth_id"]}),
     )
 
 
 @router.post("/login", response_model=TokenResponse)
 async def login(credentials: UserLogin):
     """User login"""
-    for user_id, user in users_db.items():
-        if user["email"] == credentials.email and user["password"] == credentials.password:
-            access_token = create_access_token(user_id)
-            return TokenResponse(
-                access_token=access_token,
-                expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-                user=UserResponse(**{k: v for k, v in user.items() if k not in ["password", "oauth_id"]}),
-            )
+    user = get_user_by_email(credentials.email)
+    if user and user.get("password") == credentials.password:
+        access_token = create_access_token(user["id"])
+        return TokenResponse(
+            access_token=access_token,
+            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            user=UserResponse(**{k: v for k, v in user.items() if k not in ["password", "oauth_id"]}),
+        )
     
     raise HTTPException(status_code=401, detail="Invalid email or password")
 
@@ -189,26 +353,27 @@ async def google_auth(request: GoogleAuthRequest):
         avatar = google_user.get("picture")
         
         # Find existing user by oauth_id or email
-        user_id = None
-        existing_user = None
-        
-        for uid, user in users_db.items():
-            if user.get("oauth_id") == google_id or user.get("email") == email:
-                user_id = uid
-                existing_user = user
-                break
+        existing_user = get_user_by_oauth_id(google_id) or get_user_by_email(email)
         
         if existing_user:
             # Update existing user
-            existing_user["avatar"] = avatar or existing_user.get("avatar")
-            existing_user["name"] = name or existing_user.get("name")
+            user_id = existing_user["id"]
+            updates = {}
+            if avatar and avatar != existing_user.get("avatar"):
+                updates["avatar"] = avatar
+            if name and name != existing_user.get("name"):
+                updates["name"] = name
             if not existing_user.get("oauth_id"):
-                existing_user["oauth_id"] = google_id
-                existing_user["oauth_provider"] = "google"
+                updates["oauth_id"] = google_id
+                updates["oauth_provider"] = "google"
+            if updates:
+                update_user(user_id, updates)
+                existing_user.update(updates)
+            user_data = existing_user
         else:
             # Create new user
             user_id = str(uuid.uuid4())
-            users_db[user_id] = {
+            user_data = {
                 "id": user_id,
                 "email": email,
                 "name": name,
@@ -219,9 +384,9 @@ async def google_auth(request: GoogleAuthRequest):
                 "oauth_provider": "google",
                 "oauth_id": google_id,
             }
+            create_user(user_data)
         
         access_token = create_access_token(user_id)
-        user_data = users_db[user_id]
         
         logger.info(f"Google auth successful for: {email}")
         
@@ -241,10 +406,13 @@ async def google_auth(request: GoogleAuthRequest):
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(user_id: Optional[str] = Depends(get_current_user_id)):
     """Get current user information"""
-    if not user_id or user_id not in users_db:
+    if not user_id:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    user = users_db[user_id]
+    user = get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
     return UserResponse(**{k: v for k, v in user.items() if k not in ["password", "oauth_id"]})
 
 
@@ -254,27 +422,35 @@ async def update_profile(
     user_id: Optional[str] = Depends(get_current_user_id)
 ):
     """Update user profile"""
-    if not user_id or user_id not in users_db:
+    if not user_id:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    user = users_db[user_id]
+    user = get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    updates = {}
     if profile.name:
-        user["name"] = profile.name
+        updates["name"] = profile.name
     if profile.avatar:
-        user["avatar"] = profile.avatar
+        updates["avatar"] = profile.avatar
     if profile.preferences:
-        user["preferences"] = profile.preferences
+        updates["preferences"] = json.dumps(profile.preferences)
+    
+    if updates:
+        update_user(user_id, updates)
+        user.update(updates)
     
     return UserResponse(**{k: v for k, v in user.items() if k not in ["password", "oauth_id"]})
 
 
 @router.get("/me/designs")
-async def get_user_designs(user_id: Optional[str] = Depends(get_current_user_id)):
+async def get_user_designs_endpoint(user_id: Optional[str] = Depends(get_current_user_id)):
     """Get user saved designs"""
     if not user_id:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    user_designs = designs_db.get(user_id, [])
+    user_designs = get_user_designs(user_id)
     return {
         "designs": user_designs,
         "total": len(user_designs),
@@ -282,7 +458,7 @@ async def get_user_designs(user_id: Optional[str] = Depends(get_current_user_id)
 
 
 @router.post("/me/designs", response_model=SavedDesign)
-async def save_design(
+async def save_design_endpoint(
     design: DesignSaveRequest,
     user_id: Optional[str] = Depends(get_current_user_id)
 ):
@@ -291,7 +467,7 @@ async def save_design(
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     design_id = str(uuid.uuid4())
-    saved_design = {
+    design_data = {
         "id": design_id,
         "name": design.name,
         "description": design.description,
@@ -303,18 +479,15 @@ async def save_design(
         "created_at": datetime.now().isoformat(),
     }
     
-    if user_id not in designs_db:
-        designs_db[user_id] = []
-    
-    designs_db[user_id].insert(0, saved_design)  # Add to beginning
+    save_design(user_id, design_data)
     
     logger.info(f"Design saved for user {user_id}: {design_id}")
     
-    return SavedDesign(**saved_design)
+    return SavedDesign(**design_data)
 
 
 @router.delete("/me/designs/{design_id}")
-async def delete_design(
+async def delete_design_endpoint(
     design_id: str,
     user_id: Optional[str] = Depends(get_current_user_id)
 ):
@@ -322,10 +495,9 @@ async def delete_design(
     if not user_id:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    if user_id not in designs_db:
+    deleted = delete_design_by_id(user_id, design_id)
+    if not deleted:
         raise HTTPException(status_code=404, detail="Design not found")
-    
-    designs_db[user_id] = [d for d in designs_db[user_id] if d["id"] != design_id]
     
     return {"message": "Design deleted successfully"}
 
