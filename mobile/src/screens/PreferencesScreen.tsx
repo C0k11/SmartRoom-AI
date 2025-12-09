@@ -36,6 +36,29 @@ const STYLES = [
   { id: 'minimalist', color: '#8B5CF6' },
 ];
 
+// Color palette options matching web frontend
+const COLOR_OPTIONS = [
+  { id: 'neutral', colors: ['#FFFFFF', '#E5E5E5', '#8B8B8B', '#2D2D2D'] },
+  { id: 'warm', colors: ['#FFF5E6', '#FFB347', '#D2691E', '#8B4513'] },
+  { id: 'cool', colors: ['#E6F3FF', '#87CEEB', '#4682B4', '#1E3A5F'] },
+  { id: 'earth', colors: ['#F5F5DC', '#C4A77D', '#8B7355', '#556B2F'] },
+  { id: 'pastel', colors: ['#FFE4E1', '#E0BBE4', '#957DAD', '#D4A5A5'] },
+  { id: 'bold', colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96C93D'] },
+];
+
+// Requirement options matching web frontend
+const REQUIREMENT_OPTIONS = [
+  { id: 'workspace' },
+  { id: 'gaming' },
+  { id: 'reading' },
+  { id: 'pet' },
+  { id: 'kids' },
+  { id: 'storage' },
+  { id: 'plants' },
+  { id: 'entertainment' },
+];
+
+// Legacy simple colors for backward compatibility
 const COLORS = [
   { name: 'white', color: '#FFFFFF', border: '#E2E8F0' },
   { name: 'gray', color: '#64748B', border: '#64748B' },
@@ -54,8 +77,11 @@ export default function PreferencesScreen() {
   const [selectedStyle, setSelectedStyle] = useState(preferences.style);
   const [budget, setBudget] = useState(preferences.budget);
   const [selectedColors, setSelectedColors] = useState<string[]>(preferences.colors);
+  const [selectedColorPalettes, setSelectedColorPalettes] = useState<string[]>(preferences.colorPreference || []);
+  const [selectedRequirements, setSelectedRequirements] = useState<string[]>(preferences.requirements || []);
   const [specialNeeds, setSpecialNeeds] = useState(preferences.specialNeeds);
   const [furnitureSuggestions, setFurnitureSuggestions] = useState(preferences.furnitureSuggestions);
+  const [additionalNotes, setAdditionalNotes] = useState(preferences.additionalNotes || '');
 
   const budgetProgress = useSharedValue((budget[1] - 500) / 9500);
 
@@ -71,11 +97,53 @@ export default function PreferencesScreen() {
     return labels[id] || id;
   };
 
+  const getColorLabel = (id: string) => {
+    const labels: Record<string, string> = {
+      neutral: language === 'zh' ? '中性色' : 'Neutral',
+      warm: language === 'zh' ? '暖色调' : 'Warm',
+      cool: language === 'zh' ? '冷色调' : 'Cool',
+      earth: language === 'zh' ? '大地色' : 'Earth',
+      pastel: language === 'zh' ? '糖果色' : 'Pastel',
+      bold: language === 'zh' ? '鲜艳色' : 'Bold',
+    };
+    return labels[id] || id;
+  };
+
+  const getRequirementLabel = (id: string) => {
+    const labels: Record<string, string> = {
+      workspace: language === 'zh' ? '工作区域' : 'Workspace',
+      gaming: language === 'zh' ? '游戏空间' : 'Gaming',
+      reading: language === 'zh' ? '阅读角落' : 'Reading',
+      pet: language === 'zh' ? '宠物友好' : 'Pet-friendly',
+      kids: language === 'zh' ? '儿童安全' : 'Kid-safe',
+      storage: language === 'zh' ? '更多收纳' : 'Storage',
+      plants: language === 'zh' ? '绿植空间' : 'Plants',
+      entertainment: language === 'zh' ? '娱乐中心' : 'Entertainment',
+    };
+    return labels[id] || id;
+  };
+
   const toggleColor = (colorName: string) => {
     setSelectedColors(prev =>
       prev.includes(colorName)
         ? prev.filter(c => c !== colorName)
         : [...prev, colorName]
+    );
+  };
+
+  const toggleColorPalette = (paletteId: string) => {
+    setSelectedColorPalettes(prev =>
+      prev.includes(paletteId)
+        ? prev.filter(c => c !== paletteId)
+        : [...prev, paletteId]
+    );
+  };
+
+  const toggleRequirement = (reqId: string) => {
+    setSelectedRequirements(prev =>
+      prev.includes(reqId)
+        ? prev.filter(r => r !== reqId)
+        : [...prev, reqId]
     );
   };
 
@@ -85,8 +153,11 @@ export default function PreferencesScreen() {
       style: selectedStyle,
       budget,
       colors: selectedColors,
+      colorPreference: selectedColorPalettes,
+      requirements: selectedRequirements,
       specialNeeds,
       furnitureSuggestions,
+      additionalNotes,
     });
 
     // 导航到设计结果页面
@@ -95,9 +166,13 @@ export default function PreferencesScreen() {
       preferences: {
         style: selectedStyle,
         budget,
+        budgetRange: budget,
         colors: selectedColors,
+        colorPreference: selectedColorPalettes,
+        requirements: selectedRequirements,
         specialNeeds,
         furnitureSuggestions,
+        additionalNotes,
         analysisId: currentAnalysis?.id,
       },
     });
@@ -196,26 +271,62 @@ export default function PreferencesScreen() {
           </View>
         </View>
 
-        {/* Color Preferences */}
+        {/* Color Palette Preferences */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.preferences_colors}</Text>
-          <View style={styles.colorsContainer}>
-            {COLORS.map((color) => (
+          <View style={styles.colorPalettesContainer}>
+            {COLOR_OPTIONS.map((option) => (
               <TouchableOpacity
-                key={color.name}
+                key={option.id}
                 style={[
-                  styles.colorButton,
-                  { backgroundColor: color.color, borderColor: color.border },
-                  selectedColors.includes(color.name) && styles.colorButtonSelected,
+                  styles.colorPaletteCard,
+                  selectedColorPalettes.includes(option.id) && styles.colorPaletteCardSelected,
                 ]}
-                onPress={() => toggleColor(color.name)}
+                onPress={() => toggleColorPalette(option.id)}
               >
-                {selectedColors.includes(color.name) && (
-                  <Text style={[
-                    styles.colorCheck,
-                    color.name === 'white' && { color: '#0066FF' }
-                  ]}>✓</Text>
+                {selectedColorPalettes.includes(option.id) && (
+                  <View style={styles.paletteCheckmark}>
+                    <Text style={styles.paletteCheckmarkText}>✓</Text>
+                  </View>
                 )}
+                <View style={styles.colorSwatches}>
+                  {option.colors.map((color, i) => (
+                    <View
+                      key={i}
+                      style={[styles.colorSwatch, { backgroundColor: color }]}
+                    />
+                  ))}
+                </View>
+                <Text style={[
+                  styles.colorPaletteLabel,
+                  selectedColorPalettes.includes(option.id) && styles.colorPaletteLabelSelected,
+                ]}>
+                  {getColorLabel(option.id)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Requirements */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.preferences_requirements}</Text>
+          <View style={styles.requirementsContainer}>
+            {REQUIREMENT_OPTIONS.map((req) => (
+              <TouchableOpacity
+                key={req.id}
+                style={[
+                  styles.requirementChip,
+                  selectedRequirements.includes(req.id) && styles.requirementChipSelected,
+                ]}
+                onPress={() => toggleRequirement(req.id)}
+              >
+                <Text style={[
+                  styles.requirementText,
+                  selectedRequirements.includes(req.id) && styles.requirementTextSelected,
+                ]}>
+                  {getRequirementLabel(req.id)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -458,6 +569,85 @@ const styles = StyleSheet.create({
   colorCheck: {
     fontSize: 18,
     fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  // Color palette styles
+  colorPalettesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  colorPaletteCard: {
+    width: (width - 44) / 2,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    position: 'relative',
+  },
+  colorPaletteCardSelected: {
+    borderColor: '#0066FF',
+    backgroundColor: '#F0F7FF',
+  },
+  paletteCheckmark: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#0066FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  paletteCheckmarkText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  colorSwatches: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    gap: 4,
+  },
+  colorSwatch: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  colorPaletteLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#64748B',
+  },
+  colorPaletteLabelSelected: {
+    color: '#0066FF',
+    fontWeight: '600',
+  },
+  // Requirements styles
+  requirementsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  requirementChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+  },
+  requirementChipSelected: {
+    backgroundColor: '#0066FF',
+  },
+  requirementText: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  requirementTextSelected: {
     color: '#FFFFFF',
   },
   highlightHeader: {
