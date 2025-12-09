@@ -15,6 +15,11 @@ const translations = {
     save: '保存',
     share: '分享',
     delete: '删除',
+    download: '下载',
+    regenerate: '重新生成',
+    fullscreen: '全屏查看',
+    close: '关闭',
+    copy_link: '复制链接',
     
     // 首页
     home_title: '室内设计AI',
@@ -48,6 +53,28 @@ const translations = {
     preferences_colors: '色彩偏好',
     preferences_furniture_hint: '家具意见 (AI会严格采纳)',
     preferences_generate: '生成设计方案',
+    preferences_keep_furniture: '保留家具',
+    preferences_add_furniture: '添加其他家具...',
+    preferences_requirements: '功能需求',
+    preferences_additional_notes: '其他补充说明',
+    
+    // 色彩选项
+    color_neutral: '中性色',
+    color_warm: '暖色调',
+    color_cool: '冷色调',
+    color_earth: '大地色',
+    color_pastel: '糖果色',
+    color_bold: '鲜艳色',
+    
+    // 需求选项
+    req_workspace: '工作区域',
+    req_gaming: '游戏空间',
+    req_reading: '阅读角落',
+    req_pet: '宠物友好',
+    req_kids: '儿童安全',
+    req_storage: '更多收纳',
+    req_plants: '绿植空间',
+    req_entertainment: '娱乐中心',
     
     // 设计结果
     results_title: '设计方案',
@@ -56,6 +83,27 @@ const translations = {
     results_furniture_list: '推荐家具清单',
     results_total_cost: '预计总成本',
     results_view_detail: '查看详情',
+    results_preview: '效果预览',
+    results_shopping_list: '购物清单',
+    results_original: '原始照片',
+    results_design_effect: '设计效果',
+    results_match: '匹配度',
+    results_within_budget: '在预算范围内！',
+    results_over_budget: '超出预算',
+    results_buy: '购买',
+    results_saved: '已保存',
+    results_share_title: '分享设计方案',
+    results_link_copied: '链接已复制！',
+    results_save_success: '设计已保存！',
+    results_download_success: '下载成功！',
+    results_connection_error: '无法连接服务器',
+    results_generation_complete: '设计方案生成完成！',
+    
+    // 生成进度
+    progress_analyzing: '正在分析设计需求...',
+    progress_generating: '正在生成设计理念...',
+    progress_rendering: '正在渲染效果图...',
+    progress_matching: '正在匹配家具产品...',
     
     // AR预览
     ar_title: 'AR预览',
@@ -85,6 +133,9 @@ const translations = {
     login_submit: '登录',
     login_register: '注册新账号',
     login_forgot: '忘记密码?',
+    login_google: '使用Google登录',
+    login_name: '昵称',
+    login_confirm_password: '确认密码',
     
     // 风格选项
     style_modern: '现代简约',
@@ -105,6 +156,11 @@ const translations = {
     save: 'Save',
     share: 'Share',
     delete: 'Delete',
+    download: 'Download',
+    regenerate: 'Regenerate',
+    fullscreen: 'Full View',
+    close: 'Close',
+    copy_link: 'Copy Link',
     
     // Home
     home_title: 'Interior Design AI',
@@ -138,6 +194,28 @@ const translations = {
     preferences_colors: 'Color Preferences',
     preferences_furniture_hint: 'Furniture Suggestions (AI will strictly follow)',
     preferences_generate: 'Generate Design',
+    preferences_keep_furniture: 'Keep Furniture',
+    preferences_add_furniture: 'Add other furniture...',
+    preferences_requirements: 'Requirements',
+    preferences_additional_notes: 'Additional Notes',
+    
+    // Color options
+    color_neutral: 'Neutral',
+    color_warm: 'Warm',
+    color_cool: 'Cool',
+    color_earth: 'Earth',
+    color_pastel: 'Pastel',
+    color_bold: 'Bold',
+    
+    // Requirement options
+    req_workspace: 'Workspace',
+    req_gaming: 'Gaming',
+    req_reading: 'Reading',
+    req_pet: 'Pet-friendly',
+    req_kids: 'Kid-safe',
+    req_storage: 'Storage',
+    req_plants: 'Plants',
+    req_entertainment: 'Entertainment',
     
     // Design Results
     results_title: 'Design Proposals',
@@ -146,6 +224,27 @@ const translations = {
     results_furniture_list: 'Recommended Furniture',
     results_total_cost: 'Estimated Total Cost',
     results_view_detail: 'View Details',
+    results_preview: 'Preview',
+    results_shopping_list: 'Shopping List',
+    results_original: 'Original Photo',
+    results_design_effect: 'Design Effect',
+    results_match: 'Match',
+    results_within_budget: 'Within budget!',
+    results_over_budget: 'Over budget',
+    results_buy: 'Buy',
+    results_saved: 'Saved',
+    results_share_title: 'Share Design',
+    results_link_copied: 'Link copied!',
+    results_save_success: 'Design saved!',
+    results_download_success: 'Download successful!',
+    results_connection_error: 'Cannot connect to server',
+    results_generation_complete: 'Design generation complete!',
+    
+    // Generation progress
+    progress_analyzing: 'Analyzing requirements...',
+    progress_generating: 'Generating concepts...',
+    progress_rendering: 'Rendering images...',
+    progress_matching: 'Matching furniture...',
     
     // AR Preview
     ar_title: 'AR Preview',
@@ -175,6 +274,9 @@ const translations = {
     login_submit: 'Login',
     login_register: 'Create Account',
     login_forgot: 'Forgot Password?',
+    login_google: 'Sign in with Google',
+    login_name: 'Name',
+    login_confirm_password: 'Confirm Password',
     
     // Style options
     style_modern: 'Modern',
