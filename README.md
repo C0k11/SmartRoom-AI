@@ -254,7 +254,7 @@ npx eas-cli build --platform ios
 - [ ] Integrate more image generation models (Midjourney API)
 - [ ] Real product API integration (live pricing)
 - [ ] PostgreSQL database for production
-- [ ] Multi-room project management
+- [x] Multi-room project management
 - [ ] Designer collaboration features
 - [ ] AI-powered 3D room reconstruction from photos
 

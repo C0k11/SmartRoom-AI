@@ -67,6 +67,10 @@ export interface DesignProposal {
 }
 
 interface DesignState {
+  // Project context
+  currentProjectId: string | null
+  setCurrentProjectId: (id: string | null) => void
+
   // Step 1: Upload
   uploadedImage: string | null
   setUploadedImage: (image: string | null) => void
@@ -108,6 +112,10 @@ const defaultPreferences: Preferences = {
 }
 
 export const useDesignStore = create<DesignState>((set) => ({
+  // Project context
+  currentProjectId: null,
+  setCurrentProjectId: (id) => set({ currentProjectId: id }),
+
   // Step 1
   uploadedImage: null,
   setUploadedImage: (image) => set({ uploadedImage: image }),
@@ -141,6 +149,7 @@ export const useDesignStore = create<DesignState>((set) => ({
 
   // Actions
   reset: () => set({
+    currentProjectId: null,
     uploadedImage: null,
     isAnalyzing: false,
     analysis: null,

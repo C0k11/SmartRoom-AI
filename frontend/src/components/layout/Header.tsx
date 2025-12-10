@@ -14,7 +14,8 @@ import {
   Globe,
   Clock,
   User,
-  LogOut
+  LogOut,
+  FolderOpen
 } from 'lucide-react'
 import { CartButton } from '@/components/cart'
 import { useLanguage } from '@/lib/i18n'
@@ -29,6 +30,7 @@ export function Header() {
   const navItems = [
     { href: '/', label: t('nav.home') },
     { href: '/design', label: t('nav.design') },
+    { href: '/projects', label: language === 'zh' ? '项目' : 'Projects' },
     { href: '/history', label: t('nav.history') },
     { href: '/explore', label: t('nav.explore') },
     { href: '/furniture', label: t('nav.furniture') },

@@ -21,7 +21,7 @@ import {
   ChevronRight
 } from 'lucide-react'
 import { useDesignStore, DesignProposal } from '@/store/designStore'
-import { designApi, analysisApi } from '@/lib/api'
+import { designApi, analysisApi, projectsApi, userApi } from '@/lib/api'
 import { useLanguage, formatCAD } from '@/lib/i18n'
 import { useAuth } from '@/lib/auth'
 import toast from 'react-hot-toast'
@@ -99,7 +99,8 @@ export function DesignResults() {
     uploadedImage,
     analysis,
     selectedStyle,
-    preferences
+    preferences,
+    currentProjectId
   } = useDesignStore()
   
   const { isAuthenticated } = useAuth()
@@ -453,9 +454,30 @@ export function DesignResults() {
     if (!selectedDesign) return
     
     try {
-      // Save to backend if authenticated
-      if (isAuthenticated) {
-        await designApi.save(selectedDesign.id)
+      // If we're in a project context, save to project
+      if (currentProjectId && isAuthenticated) {
+        await projectsApi.saveDesignToProject(currentProjectId, {
+          name: selectedDesign.name,
+          description: selectedDesign.description,
+          image_url: selectedDesign.image,
+          original_image: uploadedImage || undefined,
+          style: selectedDesign.style,
+          total_cost: selectedDesign.totalCost,
+          furniture_items: selectedDesign.furniture,
+        })
+        toast.success(language === 'zh' ? '设计已保存到项目！' : 'Design saved to project!')
+      } else if (isAuthenticated) {
+        // Save to user's design history
+        await userApi.saveDesign({
+          name: selectedDesign.name,
+          description: selectedDesign.description,
+          image_url: selectedDesign.image,
+          original_image: uploadedImage || undefined,
+          style: selectedDesign.style,
+          total_cost: selectedDesign.totalCost,
+          furniture_items: selectedDesign.furniture,
+        })
+        toast.success(language === 'zh' ? '设计已保存到账户！' : 'Design saved to your account!')
       }
       
       // Also save to localStorage as backup
@@ -463,7 +485,8 @@ export function DesignResults() {
       const newEntry = {
         ...selectedDesign,
         savedAt: new Date().toISOString(),
-        originalImage: uploadedImage
+        originalImage: uploadedImage,
+        projectId: currentProjectId
       }
       
       // Avoid duplicates
@@ -474,10 +497,12 @@ export function DesignResults() {
       const trimmed = filtered.slice(0, 20)
       localStorage.setItem('designHistory', JSON.stringify(trimmed))
       
-      toast.success(isAuthenticated ? 'Design saved to your account!' : 'Design saved to local history!')
+      if (!isAuthenticated) {
+        toast.success(language === 'zh' ? '设计已保存到本地！' : 'Design saved to local history!')
+      }
     } catch (error: any) {
       console.error('Failed to save design:', error)
-      toast.error(error.response?.data?.detail || 'Failed to save design')
+      toast.error(error.response?.data?.detail || (language === 'zh' ? '保存失败' : 'Failed to save design'))
       
       // Fallback to localStorage only
       const history = JSON.parse(localStorage.getItem('designHistory') || '[]')
@@ -490,7 +515,7 @@ export function DesignResults() {
       filtered.unshift(newEntry)
       const trimmed = filtered.slice(0, 20)
       localStorage.setItem('designHistory', JSON.stringify(trimmed))
-      toast.success('Design saved to local history!')
+      toast.success(language === 'zh' ? '设计已保存到本地！' : 'Design saved to local history!')
     }
   }
 
