@@ -218,7 +218,16 @@ export const projectsApi = {
     return response.data
   },
   
-  update: async (id: string, updates: any) => {
+  update: async (id: string, updates: {
+    name?: string
+    description?: string
+    room_type?: string
+    status?: string
+    thumbnail?: string
+    original_image?: string
+    analysis?: any
+    preferences?: any
+  }) => {
     const response = await api.put(`/projects/${id}`, updates)
     return response.data
   },
@@ -235,6 +244,20 @@ export const projectsApi = {
   
   duplicate: async (id: string) => {
     const response = await api.post(`/projects/${id}/duplicate`)
+    return response.data
+  },
+  
+  // Save a design to a project
+  saveDesignToProject: async (projectId: string, design: {
+    name: string
+    description?: string
+    image_url: string
+    original_image?: string
+    style: string
+    total_cost: number
+    furniture_items?: any[]
+  }) => {
+    const response = await api.post(`/projects/${projectId}/designs`, design)
     return response.data
   },
 }

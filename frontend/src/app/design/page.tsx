@@ -17,7 +17,7 @@ import {
   LogIn
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Header } from '@/components/layout/Header'
 import { ImageUploader } from '@/components/ui/ImageUploader'
 import { StyleSelector } from '@/components/design/StyleSelector'
@@ -28,13 +28,24 @@ import { DesignResults } from '@/components/design/DesignResults'
 import { useDesignStore } from '@/store/designStore'
 import { useAuth } from '@/lib/auth'
 import { useLanguage } from '@/lib/i18n'
+import { projectsApi } from '@/lib/api'
+
+interface ProjectInfo {
+  id: string
+  name: string
+  room_type: string
+}
 
 export default function DesignPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const projectId = searchParams.get('project')
+  
   const { isAuthenticated, isLoading: authLoading, user } = useAuth()
   const { language, t } = useLanguage()
   
   const [currentStep, setCurrentStep] = useState(1)
+  const [projectInfo, setProjectInfo] = useState<ProjectInfo | null>(null)
   const { 
     uploadedImage, 
     setUploadedImage, 
@@ -48,8 +59,29 @@ export default function DesignPage() {
     isGenerating,
     designs,
     setDesigns,
-    setSelectedDesign
+    setSelectedDesign,
+    setCurrentProjectId
   } = useDesignStore()
+  
+  // Set project context and load project info when component mounts
+  useEffect(() => {
+    if (projectId) {
+      setCurrentProjectId(projectId)
+      // Load project info
+      projectsApi.get(projectId).then(data => {
+        setProjectInfo({
+          id: data.id,
+          name: data.name,
+          room_type: data.room_type,
+        })
+      }).catch(err => {
+        console.error('Failed to load project info:', err)
+      })
+    }
+    return () => {
+      // Don't clear on unmount - let the user continue if they navigate away
+    }
+  }, [projectId, setCurrentProjectId])
 
   // Texts for both languages
   const texts = {
@@ -291,10 +323,26 @@ export default function DesignPage() {
         <div className="container mx-auto px-6">
           {/* Breadcrumb */}
           <div className="mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 text-warmgray-500 hover:text-terracotta-600 transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              {txt.backHome}
-            </Link>
+            {projectInfo ? (
+              <div className="flex items-center gap-2">
+                <Link href="/projects" className="inline-flex items-center gap-2 text-warmgray-500 hover:text-terracotta-600 transition-colors">
+                  <ArrowLeft className="w-4 h-4" />
+                  {language === 'zh' ? '项目' : 'Projects'}
+                </Link>
+                <span className="text-warmgray-300">/</span>
+                <Link href={`/projects/${projectInfo.id}`} className="text-warmgray-500 hover:text-terracotta-600 transition-colors">
+                  {projectInfo.name}
+                </Link>
+                <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                  {language === 'zh' ? '设计中' : 'Designing'}
+                </span>
+              </div>
+            ) : (
+              <Link href="/" className="inline-flex items-center gap-2 text-warmgray-500 hover:text-terracotta-600 transition-colors">
+                <ArrowLeft className="w-4 h-4" />
+                {txt.backHome}
+              </Link>
+            )}
           </div>
 
           {/* Progress Steps */}
