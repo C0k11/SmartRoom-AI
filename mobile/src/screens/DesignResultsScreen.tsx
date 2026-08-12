@@ -387,7 +387,7 @@ export default function DesignResultsScreen() {
                   progress >= step.threshold && progress < step.threshold + 20 && styles.stepActive,
                 ]}>
                   {progress >= step.threshold + 20 ? (
-                    <Text style={styles.stepCheckmark}>✓</Text>
+                    <Text style={styles.stepCheckmark}>{'\u2713'}</Text>
                   ) : progress >= step.threshold ? (
                     <ActivityIndicator size="small" color="#0066FF" />
                   ) : null}
@@ -420,7 +420,7 @@ export default function DesignResultsScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <Text style={styles.backIcon}>{'\u2190'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t.results_title}</Text>
         <View style={styles.headerActions}>
@@ -432,7 +432,7 @@ export default function DesignResultsScreen() {
               styles.heartIcon,
               favorites.includes(currentProposal?.id || '') && styles.heartIconActive
             ]}>
-              {favorites.includes(currentProposal?.id || '') ? '❤️' : '🤍'}
+              {favorites.includes(currentProposal?.id || '') ? '\u2764\uFE0F' : '\uD83E\uDD0D'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -539,19 +539,19 @@ export default function DesignResultsScreen() {
                 {/* Action Buttons */}
                 <View style={styles.actionsRow}>
                   <TouchableOpacity style={styles.actionBtn} onPress={() => setShowFullscreen(true)}>
-                    <Text style={styles.actionBtnIcon}>🔍</Text>
+                    <Text style={styles.actionBtnIcon}>{'\uD83D\uDD0D'}</Text>
                     <Text style={styles.actionBtnText}>{t.fullscreen}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.actionBtn} onPress={handleDownload}>
-                    <Text style={styles.actionBtnIcon}>⬇️</Text>
+                    <Text style={styles.actionBtnIcon}>{'\u2B07\uFE0F'}</Text>
                     <Text style={styles.actionBtnText}>{t.download}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.actionBtn} onPress={handleShare}>
-                    <Text style={styles.actionBtnIcon}>📤</Text>
+                    <Text style={styles.actionBtnIcon}>{'\uD83D\uDCE4'}</Text>
                     <Text style={styles.actionBtnText}>{t.share}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.actionBtn} onPress={handleSave}>
-                    <Text style={styles.actionBtnIcon}>{isSaved ? '✅' : '💾'}</Text>
+                    <Text style={styles.actionBtnIcon}>{isSaved ? '\u2705' : '\uD83D\uDCBE'}</Text>
                     <Text style={styles.actionBtnText}>{t.save}</Text>
                   </TouchableOpacity>
                 </View>
@@ -577,7 +577,7 @@ export default function DesignResultsScreen() {
                   style={styles.regenerateButton}
                   onPress={handleRegenerate}
                 >
-                  <Text style={styles.regenerateText}>🔄 {t.regenerate}</Text>
+                  <Text style={styles.regenerateText}>{t.regenerate}</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -651,7 +651,7 @@ export default function DesignResultsScreen() {
             style={styles.fullscreenClose}
             onPress={() => setShowFullscreen(false)}
           >
-            <Text style={styles.fullscreenCloseText}>✕</Text>
+            <Text style={styles.fullscreenCloseText}>{'\u2715'}</Text>
           </TouchableOpacity>
           {currentProposal && (
             <Image

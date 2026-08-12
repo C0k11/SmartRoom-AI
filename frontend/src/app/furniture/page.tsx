@@ -21,9 +21,9 @@ import { useLanguage } from '@/lib/i18n'
 
 // Region configurations
 const regions = [
-  { id: 'cn', name: '中国', nameEn: 'China', flag: '🇨🇳' },
-  { id: 'ca', name: '加拿大', nameEn: 'Canada', flag: '🇨🇦' },
-  { id: 'jp', name: '日本', nameEn: 'Japan', flag: '🇯🇵' },
+  { id: 'cn', name: '中国', nameEn: 'China', flag: '\uD83C\uDDE8\uD83C\uDDF3' },
+  { id: 'ca', name: '加拿大', nameEn: 'Canada', flag: '\uD83C\uDDE8\uD83C\uDDE6' },
+  { id: 'jp', name: '日本', nameEn: 'Japan', flag: '\uD83C\uDDEF\uD83C\uDDF5' },
 ]
 
 // China platforms

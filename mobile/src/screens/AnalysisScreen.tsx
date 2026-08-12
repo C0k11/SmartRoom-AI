@@ -41,7 +41,7 @@ export default function AnalysisScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <Text style={styles.backIcon}>{'\u2190'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t.analysis_title}</Text>
         <View style={{ width: 40 }} />

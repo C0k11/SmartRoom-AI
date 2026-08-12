@@ -283,8 +283,8 @@ async def get_demo_designs():
                     price=3200,
                     image="",
                     links=[
-                        FurnitureLink(name="Amazon", url="https://www.amazon.ca/s?k=nordic+fabric+sofa", icon="🛒"),
-                        FurnitureLink(name="IKEA", url="https://www.ikea.com/ca/en/search/?q=sofa", icon="🏠"),
+                        FurnitureLink(name="Amazon", url="https://www.amazon.ca/s?k=nordic+fabric+sofa", icon="\U0001F6D2"),
+                        FurnitureLink(name="IKEA", url="https://www.ikea.com/ca/en/search/?q=sofa", icon="\U0001F3E0"),
                     ],
                     dimensions="220x85x80cm",
                     brand="IKEA",
@@ -297,8 +297,8 @@ async def get_demo_designs():
                     price=1200,
                     image="",
                     links=[
-                        FurnitureLink(name="Amazon", url="https://www.amazon.ca/s?k=wood+coffee+table", icon="🛒"),
-                        FurnitureLink(name="Wayfair", url="https://www.wayfair.ca/keyword.html?keyword=coffee+table", icon="🛋️"),
+                        FurnitureLink(name="Amazon", url="https://www.amazon.ca/s?k=wood+coffee+table", icon="\U0001F6D2"),
+                        FurnitureLink(name="Wayfair", url="https://www.wayfair.ca/keyword.html?keyword=coffee+table", icon="\U0001F6CB\uFE0F"),
                     ],
                     dimensions="120x60x45cm",
                     brand="源氏木语",
@@ -323,8 +323,8 @@ async def get_demo_designs():
                     price=2800,
                     image="",
                     links=[
-                        FurnitureLink(name="Amazon", url="https://www.amazon.ca/s?k=tatami+sofa", icon="🛒"),
-                        FurnitureLink(name="MUJI", url="https://muji.ca/search?q=sofa", icon="🎍"),
+                        FurnitureLink(name="Amazon", url="https://www.amazon.ca/s?k=tatami+sofa", icon="\U0001F6D2"),
+                        FurnitureLink(name="MUJI", url="https://muji.ca/search?q=sofa", icon="\U0001F38D"),
                     ],
                     dimensions="200x90x35cm",
                     brand="木智工坊",

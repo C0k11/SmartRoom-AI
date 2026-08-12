@@ -262,7 +262,7 @@ export default function DashboardPage() {
                   <div className="p-4">
                     <h3 className="font-semibold text-warmgray-900 mb-1">{project.name}</h3>
                     <p className="text-sm text-warmgray-500 mb-3">
-                      {roomTypeLabels[project.roomType]} · {project.designsCount} 个方案
+                      {roomTypeLabels[project.roomType]} {'\u00B7'} {project.designsCount} 个方案
                     </p>
                     
                     {project.selectedDesign && (
@@ -285,7 +285,7 @@ export default function DashboardPage() {
                         href={`/project/${project.id}`}
                         className="text-terracotta-600 font-medium hover:text-terracotta-700"
                       >
-                        查看详情 →
+                        查看详情 {'\u2192'}
                       </Link>
                     </div>
                   </div>

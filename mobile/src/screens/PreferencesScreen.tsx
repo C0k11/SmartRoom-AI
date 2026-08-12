@@ -190,7 +190,7 @@ export default function PreferencesScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <Text style={styles.backIcon}>{'\u2190'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t.preferences_title}</Text>
         <View style={{ width: 40 }} />
@@ -286,7 +286,7 @@ export default function PreferencesScreen() {
               >
                 {selectedColorPalettes.includes(option.id) && (
                   <View style={styles.paletteCheckmark}>
-                    <Text style={styles.paletteCheckmarkText}>✓</Text>
+                    <Text style={styles.paletteCheckmarkText}>{'\u2713'}</Text>
                   </View>
                 )}
                 <View style={styles.colorSwatches}>

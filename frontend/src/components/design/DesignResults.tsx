@@ -840,7 +840,7 @@ export function DesignResults() {
                           <div className="flex-1 min-w-0">
                             <h4 className="font-semibold text-slate-900">{item.name}</h4>
                             <p className="text-sm text-slate-500">
-                              {item.brand} · {item.dimensions}
+                              {item.brand} {'\u00B7'} {item.dimensions}
                             </p>
                           </div>
                           <div className="text-right">

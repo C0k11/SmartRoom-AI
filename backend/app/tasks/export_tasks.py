@@ -160,15 +160,15 @@ def generate_shopping_list_pdf(
         )
         elements.append(Paragraph("备注:", styles['Heading3']))
         elements.append(Paragraph(
-            "• 价格仅供参考，实际价格请以商家官网为准",
+            "- 价格仅供参考，实际价格请以商家官网为准",
             notes_style
         ))
         elements.append(Paragraph(
-            "• 部分商品可能存在缺货情况，建议提前确认库存",
+            "- 部分商品可能存在缺货情况，建议提前确认库存",
             notes_style
         ))
         elements.append(Paragraph(
-            "• 如需了解更多设计方案，请访问 roomai.com",
+            "- 如需了解更多设计方案，请访问 roomai.com",
             notes_style
         ))
         

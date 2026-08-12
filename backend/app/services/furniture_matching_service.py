@@ -16,32 +16,32 @@ PLATFORMS = {
         "currency": "CAD",
         "currency_symbol": "$",
         "platforms": [
-            {"name": "Amazon Canada", "url": "https://www.amazon.ca/s?k={query}", "icon": "🛒"},
-            {"name": "Best Buy Canada", "url": "https://www.bestbuy.ca/en-ca/search?search={query}", "icon": "💻"},
-            {"name": "IKEA Canada", "url": "https://www.ikea.com/ca/en/search/?q={query}", "icon": "🏠"},
-            {"name": "Wayfair Canada", "url": "https://www.wayfair.ca/keyword.html?keyword={query}", "icon": "🛋️"},
-            {"name": "Structube", "url": "https://www.structube.com/en_ca/search?q={query}", "icon": "🪑"},
+            {"name": "Amazon Canada", "url": "https://www.amazon.ca/s?k={query}", "icon": "\U0001F6D2"},
+            {"name": "Best Buy Canada", "url": "https://www.bestbuy.ca/en-ca/search?search={query}", "icon": "\U0001F4BB"},
+            {"name": "IKEA Canada", "url": "https://www.ikea.com/ca/en/search/?q={query}", "icon": "\U0001F3E0"},
+            {"name": "Wayfair Canada", "url": "https://www.wayfair.ca/keyword.html?keyword={query}", "icon": "\U0001F6CB\uFE0F"},
+            {"name": "Structube", "url": "https://www.structube.com/en_ca/search?q={query}", "icon": "\U0001FA91"},
         ]
     },
     "US": {  # United States
         "currency": "USD",
         "currency_symbol": "$",
         "platforms": [
-            {"name": "Amazon US", "url": "https://www.amazon.com/s?k={query}", "icon": "🛒"},
-            {"name": "Best Buy US", "url": "https://www.bestbuy.com/site/searchpage.jsp?st={query}", "icon": "💻"},
-            {"name": "IKEA US", "url": "https://www.ikea.com/us/en/search/?q={query}", "icon": "🏠"},
-            {"name": "Wayfair US", "url": "https://www.wayfair.com/keyword.html?keyword={query}", "icon": "🛋️"},
-            {"name": "Target", "url": "https://www.target.com/s?searchTerm={query}", "icon": "🎯"},
+            {"name": "Amazon US", "url": "https://www.amazon.com/s?k={query}", "icon": "\U0001F6D2"},
+            {"name": "Best Buy US", "url": "https://www.bestbuy.com/site/searchpage.jsp?st={query}", "icon": "\U0001F4BB"},
+            {"name": "IKEA US", "url": "https://www.ikea.com/us/en/search/?q={query}", "icon": "\U0001F3E0"},
+            {"name": "Wayfair US", "url": "https://www.wayfair.com/keyword.html?keyword={query}", "icon": "\U0001F6CB\uFE0F"},
+            {"name": "Target", "url": "https://www.target.com/s?searchTerm={query}", "icon": "\U0001F3AF"},
         ]
     },
     "CN": {  # China
         "currency": "CNY",
         "currency_symbol": "¥",
         "platforms": [
-            {"name": "淘宝", "url": "https://s.taobao.com/search?q={query}", "icon": "🛒"},
-            {"name": "天猫", "url": "https://list.tmall.com/search_product.htm?q={query}", "icon": "🐱"},
-            {"name": "京东", "url": "https://search.jd.com/Search?keyword={query}", "icon": "📦"},
-            {"name": "宜家中国", "url": "https://www.ikea.cn/cn/zh/search/?q={query}", "icon": "🏠"},
+            {"name": "淘宝", "url": "https://s.taobao.com/search?q={query}", "icon": "\U0001F6D2"},
+            {"name": "天猫", "url": "https://list.tmall.com/search_product.htm?q={query}", "icon": "\U0001F431"},
+            {"name": "京东", "url": "https://search.jd.com/Search?keyword={query}", "icon": "\U0001F4E6"},
+            {"name": "宜家中国", "url": "https://www.ikea.cn/cn/zh/search/?q={query}", "icon": "\U0001F3E0"},
         ]
     },
 }
@@ -101,7 +101,7 @@ class FurnitureMatchingService:
 **User's Specific Requests**: {user_needs if user_needs else "No specific requests"}
 **Region**: {region} (use local pricing and stores)
 
-⚠️ CRITICAL INSTRUCTIONS - YOU MUST FOLLOW EXACTLY:
+CRITICAL INSTRUCTIONS - YOU MUST FOLLOW EXACTLY:
 
 1. **ONLY recommend products that the user specifically asked for.** 
    - If user said "只要电脑" or "很多电脑" (only computers / many computers), recommend ONLY computers, monitors, and PC-related equipment

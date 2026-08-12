@@ -581,7 +581,7 @@ export function Preview3D({ isOpen, onClose, imageUrl, designName, furniture, st
         
         {/* Instructions */}
         <div className="absolute top-4 left-4 bg-black/50 rounded-lg p-3 text-white text-sm max-w-xs">
-          <p className="text-yellow-300 text-xs mb-2">⚠️ 此为风格概念展示，非精确复制设计图</p>
+          <p className="text-yellow-300 text-xs mb-2">此为风格概念展示，非精确复制设计图</p>
           <div className="flex items-center gap-2 mb-1">
             <Move className="w-4 h-4" />
             <span>左键拖拽旋转</span>

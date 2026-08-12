@@ -176,8 +176,8 @@ export function ARPreview({
               <div className="text-sm text-warmgray-500">
                 <p>支持的设备：</p>
                 <ul className="mt-2 space-y-1">
-                  <li>• iOS 12+ Safari (需要ARKit支持)</li>
-                  <li>• Android Chrome (需要ARCore支持)</li>
+                  <li>- iOS 12+ Safari (需要ARKit支持)</li>
+                  <li>- Android Chrome (需要ARCore支持)</li>
                 </ul>
               </div>
             </motion.div>

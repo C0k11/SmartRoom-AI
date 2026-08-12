@@ -72,7 +72,7 @@ export const translations: Translations = {
   'design.analysis.title': { zh: '房间分析', en: 'Room Analysis' },
   'design.analysis.subtitle': { zh: 'AI将识别房间类型、现有家具和设计潜力', en: 'AI will identify room type, furniture, and design potential' },
   
-  'design.tips.title': { zh: '📸 拍照小贴士', en: '📸 Photo Tips' },
+  'design.tips.title': { zh: '拍照小贴士', en: 'Photo Tips' },
   'design.tips.1': { zh: '尽量拍摄房间的全景', en: 'Capture the full room view' },
   'design.tips.2': { zh: '保持照片水平，避免倾斜', en: 'Keep the photo level, avoid tilting' },
   'design.tips.3': { zh: '确保光线充足', en: 'Ensure good lighting' },

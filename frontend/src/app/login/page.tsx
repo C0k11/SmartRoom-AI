@@ -60,7 +60,7 @@ export default function LoginPage() {
       const token = localStorage.getItem('token')
       
       if (savedUser && token) {
-        console.log('✅ Confirmed: User data in localStorage')
+        console.log('Confirmed: User data in localStorage')
         router.push(redirect)
         // Force redirect as backup
         setTimeout(() => {
@@ -209,10 +209,10 @@ export default function LoginPage() {
       const successMessage = isLogin ? txt.success.login : txt.success.register
       toast.success(successMessage, {
         duration: 2000,
-        icon: '✅',
+        icon: '\u2705',
       })
       
-      console.log('✅ Login/Register successful!')
+      console.log('Login/Register successful!')
       console.log('User in localStorage:', localStorage.getItem('user'))
       console.log('Token in localStorage:', localStorage.getItem('token') ? 'Present' : 'Missing')
       
@@ -221,14 +221,14 @@ export default function LoginPage() {
       const token = localStorage.getItem('token')
       
       if (!savedUser || !token) {
-        console.error('❌ Warning: localStorage not set correctly')
+        console.error('Warning: localStorage not set correctly')
         throw new Error('Failed to save login credentials')
       }
       
       // The useEffect will handle the redirect when loginSuccess or user state updates
       
     } catch (error: any) {
-      console.error('❌ Auth error:', error)
+      console.error('Auth error:', error)
       const errorMessage = typeof error === 'string' 
         ? error 
         : (error?.message || error?.response?.data?.detail || 'Authentication failed')
@@ -255,13 +255,13 @@ export default function LoginPage() {
       
       toast.success(txt.success.login, {
         duration: 2000,
-        icon: '✅',
+        icon: '\u2705',
       })
       
-      console.log('✅ Google OAuth login successful!')
+      console.log('Google OAuth login successful!')
       
     } catch (error: any) {
-      console.error('❌ Google OAuth error:', error)
+      console.error('Google OAuth error:', error)
       toast.error(error?.message || 'Google login failed', {
         duration: 4000,
       })
@@ -585,7 +585,7 @@ export default function LoginPage() {
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  placeholder={'\u2022'.repeat(8)}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className={`input-primary pl-12 pr-12 ${errors.password ? 'border-red-500 focus:ring-red-500' : ''}`}
@@ -615,7 +615,7 @@ export default function LoginPage() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
+                    placeholder={'\u2022'.repeat(8)}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     className={`input-primary pl-12 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : ''}`}
